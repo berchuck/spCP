@@ -180,7 +180,7 @@ spCP <- function(Y, DM, W, Time, Starting = NULL, Hypers = NULL, Tuning = NULL, 
   if (missing(Time)) stop("Time: missing")
 
   ###Check model inputs
-  # CheckInputs(Y, DM, W, Time, Starting, Hypers, Tuning, MCMC, Family, TemporalStructure, Distance, Weights, Rho, ScaleY, ScaleDM)
+  CheckInputs(Y, DM, W, Time, Starting, Hypers, Tuning, MCMC, Family, Distance, Weights, Rho, ScaleY, ScaleDM)
 
   ####Set seed for reproducibility
   set.seed(Seed)

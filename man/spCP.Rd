@@ -4,7 +4,7 @@
 \name{spCP}
 \alias{spCP}
 \alias{spCP-package}
-\title{MCMC sampler for spatiotemporal boundary detection with dissimilarity metric.}
+\title{MCMC sampler for spatially varying change point model.}
 \usage{
 spCP(Y, DM, W, Time, Starting = NULL, Hypers = NULL, Tuning = NULL,
   MCMC = NULL, Family = "tobit", Weights = "continuous",
@@ -33,9 +33,9 @@ vector of outcomes in increasing order.}
  of the starting values may be specified.
 
  When \code{NULL} is chosen then default starting values are automatically generated.
- Otherwise a \code{list} must be provided with names \code{Delta}, \code{T} or
- \code{Phi} containing appropriate objects. \code{Delta} must be a \code{3} dimensional
- vector, \code{T} a \code{3 x 3} dimensional matrix and \code{Phi} a scalar.}
+ Otherwise a \code{list} must be provided with names \code{Delta}, \code{Alpha} or
+ \code{Sigma} containing appropriate objects. \code{Delta} must be a \code{5} dimensional
+ vector, \code{Sigma} a \code{5 x 5} dimensional matrix and \code{Alpha} a scalar.}
 
 \item{Hypers}{Either \code{NULL} or a \code{list} containing hyperparameter values
  to be specified for the MCMC sampler. If \code{NULL} is not chosen then none, some or all
@@ -43,34 +43,29 @@ vector of outcomes in increasing order.}
 
  When \code{NULL} is chosen then default hyperparameter values are automatically
  generated. These default hyperparameters are described in detail in (Berchuck et al.).
- Otherwise a \code{list} must be provided with names \code{Delta}, \code{T} or
- \code{Phi} containing further hyperparameter information. These objects are themselves
+ Otherwise a \code{list} must be provided with names \code{Delta}, \code{Sigma} or
+ \code{Alpha} containing further hyperparameter information. These objects are themselves
  \code{lists} and may be constructed as follows.
 
- \code{Delta} is a \code{list} with two objects, \code{MuDelta} and \code{OmegaDelta}.
- \code{MuDelta} represents the mean component of the multivariate normal hyperprior and
- must be a \code{3} dimensional vector, while \code{OmegaDelta} represents the covariance
- and must be a \code{3 x 3} dimensional matrix.
+ \code{Delta} is a \code{list} with one object, \code{Kappa2}. \code{Kappa2} represents
+ the prior variance and must be a scalar. \code{Sigma} is a \code{list} with two objects,
+ \code{Xi} and \code{Psi}. \code{Xi} represents the degrees of freedom parameter for the
+ inverse-Wishart hyperprior and must be a real number scalar, while \code{Psi} represents
+ the scale matrix and must be a \code{5 x 5} dimensional positive definite matrix.
 
- \code{T} is a \code{list} with two objects, \code{Xi} and \code{Psi}. \code{Xi}
- represents the degrees of freedom parameter for the inverse-Wishart hyperprior and
- must be a real number scalar, while \code{Psi} represents the scale matrix
- and must be a \code{3 x 3} dimensional positive definite matrix.
-
- \code{Phi} is a \code{list} with two objects, \code{APhi} and \code{BPhi}. \code{APhi}
- represents the lower bound for the uniform hyperprior, while \code{BPhi} represents
- the upper bound. The bounds must be specified carefully. For example, if the exponential
- temporal correlation structure is chosen both bounds must be restricted to be non-negative.}
+ \code{Alpha} is a \code{list} with two objects, \code{AAlpha} and \code{BAlpha}. \code{AAlpha}
+ represents the lower bound for the uniform hyperprior, while \code{BAlpha} represents
+ the upper bound. The bounds must be specified carefully.}
 
 \item{Tuning}{Either \code{NULL} or a \code{list} containing tuning values
  to be specified for the MCMC Metropolis steps. If \code{NULL} is not chosen then all
  of the tuning values must be specified.
 
  When \code{NULL} is chosen then default tuning values are automatically generated to
- \code{1}. Otherwise a \code{list} must be provided with names \code{Theta2},
- \code{Theta3} and \code{Phi}. \code{Theta2} and \code{Theta3} must be
- \code{Nu} dimensional vectors and \code{Phi} a scalar. Each containing tuning variances
- for their corresponding Metropolis updates.}
+ \code{1}. Otherwise a \code{list} must be provided with names \code{Lambda0Vec},
+ \code{Lambda1Vec}, \code{EtaVec} and \code{Alpha}. \code{Lambda0Vec}, \code{Lambda1Vec},
+ and \code{EtaVec} must be \code{M} dimensional vectors and \code{Alpha} a scalar.
+ Each containing tuning variances for their corresponding Metropolis updates.}
 
 \item{MCMC}{Either \code{NULL} or a \code{list} containing input values to be used
  for implementing the MCMC sampler. If \code{NULL} is not chosen then all
@@ -117,28 +112,38 @@ distances is often used for improved MCMC convergence. By default it is fixed at
 
   \describe{
 
-  \item{\code{mu}}{\code{NKeep x Nu} \code{matrix} of posterior samples for \code{mu}. The
-  t-th column contains posterior samples from the the t-th time point.}
+  \item{\code{beta0}}{\code{NKeep x M} \code{matrix} of posterior samples for \code{beta0}.
+  The s-th column contains posterior samples from the the s-th location.}
 
-  \item{\code{tau2}}{\code{NKeep x Nu} \code{matrix} of posterior samples for \code{tau2}.
-  The t-th column contains posterior samples from the the t-th time point.}
+  \item{\code{beta1}}{\code{NKeep x M} \code{matrix} of posterior samples for \code{beta1}.
+  The s-th column contains posterior samples from the the s-th location.}
 
-  \item{\code{alpha}}{\code{NKeep x Nu} \code{matrix} of posterior samples for \code{alpha}.
-  The t-th column contains posterior samples from the the t-th time point.}
+  \item{\code{lambda0}}{\code{NKeep x M} \code{matrix} of posterior samples for \code{lambda0}.
+  The s-th column contains posterior samples from the the s-th location.}
 
-  \item{\code{delta}}{\code{NKeep x 3} \code{matrix} of posterior samples for \code{delta}.
+  \item{\code{lambda1}}{\code{NKeep x M} \code{matrix} of posterior samples for \code{lambda1}.
+  The s-th column contains posterior samples from the the s-th location.}
+
+  \item{\code{eta}}{\code{NKeep x M} \code{matrix} of posterior samples for \code{eta}.
+  The s-th column contains posterior samples from the the s-th location.}
+
+  \item{\code{theta}}{\code{NKeep x M} \code{matrix} of posterior samples for \code{theta}.
+  The s-th column contains posterior samples from the the s-th location.}
+
+  \item{\code{delta}}{\code{NKeep x 5} \code{matrix} of posterior samples for \code{delta}.
   The columns have names that describe the samples within them.}
 
-  \item{\code{T}}{\code{NKeep x 6} \code{matrix} of posterior samples for \code{T}. The
+  \item{\code{sigma}}{\code{NKeep x 15} \code{matrix} of posterior samples for \code{Sigma}. The
   columns have names that describe the samples within them. The row is listed first, e.g.,
-  \code{t32} refers to the entry in row \code{3}, column \code{2}.}
+  \code{Sigma32} refers to the entry in row \code{3}, column \code{2}.}
 
-  \item{\code{phi}}{\code{NKeep x 1} \code{matrix} of posterior samples for \code{phi}.}
+  \item{\code{alpha}}{\code{NKeep x 1} \code{matrix} of posterior samples for \code{Alpha}.}
 
-  \item{\code{metropolis}}{\code{(2 * Nu + 1) x 2} \code{matrix} of metropolis
-  acceptance rates and tuners that result from the pilot adaptation. The first \code{Nu}
-  correspond to the \code{Theta2} (i.e. \code{tau2}) parameters, the next \code{Nu} correspond to
-  the \code{Theta3} (i.e. \code{alpha}) parameters and the last row give the \code{phi} values.}
+  \item{\code{metropolis}}{\code{(3 * M + 1) x 3} \code{matrix} of metropolis
+  acceptance rates, updated tuners, and original tuners that result from the pilot
+  adaptation. The first \code{M} correspond to the \code{Lambda0Vec} parameters,
+  the next \code{M} correspond to the \code{Lambda1Vec}, the next \code{M} correspond
+  to the \code{EtaVec} parameters and the last row give the \code{Alpha} values.}
 
   \item{\code{runtime}}{A \code{character} string giving the runtime of the MCMC sampler.}
 
@@ -151,8 +156,9 @@ distances is often used for improved MCMC convergence. By default it is fixed at
   }
 }
 \description{
-\code{STBDwDM} is a Markov chain Monte Carlo (MCMC) sampler for a spatiotemporal
- boundary detection model using the Bayesian hierarchical framework.
+\code{spCP} is a Markov chain Monte Carlo (MCMC) sampler for a spatially varying change point
+ model with spatially varying slopes, intercepts, and unique variances at each spatialtemporal
+ location. The model is implemented using the Bayesian hierarchical framework.
 
 This package implements a spatiotemporal boundary detection
 with a dissimilarity metric for areal data with inference in a Bayesian setting
@@ -165,7 +171,7 @@ in the accompanying vignette.
 }
 \details{
 Details of the underlying statistical model proposed by proposed by
- Berchuck et al. 2017. are forthcoming.
+ Berchuck et al. 2018. are forthcoming.
 }
 \author{
 Samuel I. Berchuck
@@ -173,6 +179,6 @@ Samuel I. Berchuck
 Samuel I. Berchuck \email{berchuck@ad.unc.edu}
 }
 \references{
-Reference for Berchuck et al. 2017 is forthcoming.
+Reference for Berchuck et al. 2018 is forthcoming.
 }
 

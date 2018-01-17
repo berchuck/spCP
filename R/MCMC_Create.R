@@ -218,7 +218,10 @@ CreatePara <- function(Starting, DatObj, HyPara) {
   if (!("Sigma" %in% UserStarters)) Sigma <- diag(5)
 
   ###Set initial values of Alpha
-  if ("Alpha" %in% UserStarters) Alpha <- Starting$Alpha
+  if ("Alpha" %in% UserStarters) {
+    Alpha <- Starting$Alpha
+    if ((Alpha <= AAlpha) | (Alpha >= BAlpha)) stop('Starting: "Alpha" must be in (AAlpha, BAlpha)')
+  }
   if ((!"Alpha" %in% UserStarters)) Alpha <- mean(c(AAlpha, BAlpha))
 
   ###Set initial values of Delta

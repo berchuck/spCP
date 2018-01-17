@@ -1,4 +1,4 @@
-CheckInputs <- function(Y, DM, W, Time, Starting, Hypers, Tuning, MCMC, Family, TemporalStructure, Distance, Weights, Rho, ScaleY, ScaleDM) {
+CheckInputs <- function(Y, DM, W, Time, Starting, Hypers, Tuning, MCMC, Family, Distance, Weights, Rho, ScaleY, ScaleDM) {
 
   ###Data dimensions
   N <- length(Y)
@@ -13,9 +13,6 @@ CheckInputs <- function(Y, DM, W, Time, Starting, Hypers, Tuning, MCMC, Family, 
 
   ###Weights
   if (!Weights %in% c("continuous", "binary")) stop('Weights: must be one of "continuous" or "binary"')
-
-  ###Temporal structure
-  if (!TemporalStructure %in% c("exponential", "ar1")) stop('TemporalStructure: must be one of "exponential" or "ar1"')
 
   ###Rho
   if (missing(Rho)) stop("Rho: missing")
@@ -76,68 +73,50 @@ CheckInputs <- function(Y, DM, W, Time, Starting, Hypers, Tuning, MCMC, Family, 
   ###Hypers
   if (!is.null(Hypers)) {
     if (!is.list(Hypers)) stop('Hypers must be a list')
-    if (!all(names(Hypers) %in% c("Delta", "T", "Phi"))) stop('Hypers: Can only contain lists with names "Delta", "T" and "Phi"')
+    if (!all(names(Hypers) %in% c("Delta", "Sigma", "Alpha"))) stop('Hypers: Can only contain lists with names "Delta", "Sigma" and "Alpha"')
 
     ###If delta hyperparameters are provided
     if ("Delta" %in% names(Hypers)) {
       if (!is.list(Hypers$Delta)) stop('Hypers: "Delta" must be a list')
-      if (!"MuDelta" %in% names(Hypers$Delta)) stop('Hypers: "MuDelta" value missing')
-      if (!is.numeric(Hypers$Delta$MuDelta)) stop('Hypers: "MuDelta" must be a vector')
-      if (length(Hypers$Delta$MuDelta) != 3) stop('Hypers: "MuDelta" must be length 3')
-      if (!all(!is.na(Hypers$Delta$MuDelta))) stop('Hypers: "MuDelta" cannot have missing values')
-      if (!all(is.finite(Hypers$Delta$MuDelta))) stop('Hypers: "MuDelta" cannot have infinite values')
-      if (!"OmegaDelta" %in% names(Hypers$Delta)) stop('Hypers: "OmegaDelta" value missing')
-      if (!is.matrix(Hypers$Delta$OmegaDelta)) stop('Hypers: "OmegaDelta" must be a matrix')
-      if (!dim(Hypers$Delta$OmegaDelta)[1] == 3) stop('Hypers: "OmegaDelta" must be 3 dimensional')
-      if (!all(!is.na(Hypers$Delta$OmegaDelta))) stop('Hypers: "OmegaDelta" cannot have missing values')
-      if (!all(is.finite(Hypers$Delta$OmegaDelta))) stop('Hypers: "OmegaDelta" cannot have infinite values')
-      if (!dim(Hypers$Delta$OmegaDelta)[2] == 3) stop('Hypers: "OmegaDelta" must be square')
-      if (sum( !( (Hypers$Delta$OmegaDelta) == t(Hypers$Delta$OmegaDelta) ) ) > 0) stop('Hypers: "OmegaDelta" must be symmetric')
-      if ((det(Hypers$Delta$OmegaDelta) - 0) < 0.00001) stop('Hypers: "OmegaDelta" is close to singular')
-      if (!all(!is.na(Hypers$Delta$OmegaDelta))) stop('Hypers: "OmegaDelta" cannot have missing values')
+      if (!"Kappa2" %in% names(Hypers$Delta)) stop('Hypers: "Kappa2" value missing')
+      if (!is.scalar(Hypers$Delta$Kappa2)) stop('Hypers: "Kappa2" must be a scalar')
+      if (is.na(Hypers$Delta$Kappa2)) stop('Hypers: "Kappa2" cannot be NA')
+      if (!is.finite(Hypers$Delta$Kappa2)) stop('Hypers: "Kappa2" cannot be infinite')
+      if (Hypers$Delta$Kappa2 <= 0) stop('Hypers: "Kappa2" must be strictly positive')
     }
 
-    ###If T hyperparameters are provided
-    if ("T" %in% names(Hypers)) {
-      if (!is.list(Hypers$T)) stop('Hypers: "T" must be a list')
-      if (!"Xi" %in% names(Hypers$T)) stop('Hypers: "Xi" value missing')
-      if (!is.scalar(Hypers$T$Xi)) stop('Hypers: "Xi" must be a scalar')
-      if (is.na(Hypers$T$Xi)) stop('Hypers: "Xi" cannot be NA')
-      if (!is.finite(Hypers$T$Xi)) stop('Hypers: "Xi" cannot be infinite')
-      if (Hypers$T$Xi < 3) stop('Hypers: "Xi" must be greater than or equal to 3')
-      if (!"Psi" %in% names(Hypers$T)) stop('Hypers: "Psi" value missing')
-      if (!is.matrix(Hypers$T$Psi)) stop('Hypers: "Psi" must be a matrix')
-      if (!dim(Hypers$T$Psi)[1] == 3) stop('Hypers: "Psi" must be 3 dimensional')
-      if (!all(!is.na(Hypers$T$Psi))) stop('Hypers: "Psi" cannot have missing values')
-      if (!all(is.finite(Hypers$T$Psi))) stop('Hypers: "Psi" cannot have infinite values')
-      if (!dim(Hypers$T$Psi)[2] == 3) stop('Hypers: "Psi" must be square')
-      if (sum( !( (Hypers$T$Psi) == t(Hypers$T$Psi) ) ) > 0) stop('Hypers: "Psi" must be symmetric')
-      if ((det(Hypers$T$Psi) - 0) < 0.00001) stop('Hypers: "Psi" is close to singular')
+    ###If Sigma hyperparameters are provided
+    if ("Sigma" %in% names(Hypers)) {
+      if (!is.list(Hypers$Sigma)) stop('Hypers: "Sigma" must be a list')
+      if (!"Xi" %in% names(Hypers$Sigma)) stop('Hypers: "Xi" value missing')
+      if (!is.scalar(Hypers$Sigma$Xi)) stop('Hypers: "Xi" must be a scalar')
+      if (is.na(Hypers$Sigma$Xi)) stop('Hypers: "Xi" cannot be NA')
+      if (!is.finite(Hypers$Sigma$Xi)) stop('Hypers: "Xi" cannot be infinite')
+      if (Hypers$Sigma$Xi < 3) stop('Hypers: "Xi" must be greater than or equal to 5')
+      if (!"Psi" %in% names(Hypers$Sigma)) stop('Hypers: "Psi" value missing')
+      if (!is.matrix(Hypers$Sigma$Psi)) stop('Hypers: "Psi" must be a matrix')
+      if (!dim(Hypers$Sigma$Psi)[1] == 5) stop('Hypers: "Psi" must be 5 dimensional')
+      if (!all(!is.na(Hypers$Sigma$Psi))) stop('Hypers: "Psi" cannot have missing values')
+      if (!all(is.finite(Hypers$Sigma$Psi))) stop('Hypers: "Psi" cannot have infinite values')
+      if (!dim(Hypers$Sigma$Psi)[2] == 5) stop('Hypers: "Psi" must be square')
+      if (sum( !( (Hypers$Sigma$Psi) == t(Hypers$Sigma$Psi) ) ) > 0) stop('Hypers: "Psi" must be symmetric')
+      if ((det(Hypers$Sigma$Psi) - 0) < 0.00001) stop('Hypers: "Psi" is close to singular')
     }
 
-    ###If phi hyperparameters are provided
-    if ("Phi" %in% names(Hypers)) {
-      if (!is.list(Hypers$Phi)) stop('Hypers: "Phi" must be a list')
-      if (!"APhi" %in% names(Hypers$Phi)) stop('Hypers: "APhi" value missing')
-      if (!is.scalar(Hypers$Phi$APhi)) stop('Hypers: "APhi" must be a scalar')
-      if (is.na(Hypers$Phi$APhi)) stop('Hypers: "APhi" cannot be NA')
-      if (!is.finite(Hypers$Phi$APhi)) stop('Hypers: "APhi" cannot be infinite')
-      if (!"BPhi" %in% names(Hypers$Phi)) stop('Hypers: "BPhi" value missing')
-      if (!is.scalar(Hypers$Phi$BPhi)) stop('Hypers: "BPhi" must be a scalar')
-      if (is.na(Hypers$Phi$BPhi)) stop('Hypers: "BPhi" cannot be NA')
-      if (!is.finite(Hypers$Phi$BPhi)) stop('Hypers: "BPhi" cannot be infinite')
-      if (TemporalStructure == "exponential") {
-        if (Hypers$Phi$APhi <= 0) stop('Hypers: For "exponential" correlation "APhi" must be strictly positive')
-        if (Hypers$Phi$BPhi <= 0) stop('Hypers: For "exponential" correlation "BPhi" must be strictly positive')
-        if (Hypers$Phi$BPhi < Hypers$Phi$APhi) stop('Hypers: "BPhi" must be greater than "APhi"')
-      }
-      if (TemporalStructure == "ar1") {
-        if (Hypers$Phi$APhi < 0) stop('Hypers: For "ar1" correlation "APhi" must be in [0, 1]')
-        if (Hypers$Phi$APhi > 1) stop('Hypers: For "ar1" correlation "APhi" must be in [0, 1]')
-        if (Hypers$Phi$BPhi < 0) stop('Hypers: For "ar1" correlation "BPhi" must be in [0, 1]')
-        if (Hypers$Phi$BPhi > 1) stop('Hypers: For "ar1" correlation "BPhi" must be in [0, 1]')
-        if (Hypers$Phi$BPhi < Hypers$Phi$APhi) stop('Hypers: "BPhi" must be greater than "APhi"')
-      }
+    ###If Alpha hyperparameters are provided
+    if ("Alpha" %in% names(Hypers)) {
+      if (!is.list(Hypers$Alpha)) stop('Hypers: "Alpha" must be a list')
+      if (!"AAlpha" %in% names(Hypers$Alpha)) stop('Hypers: "AAlpha" value missing')
+      if (!is.scalar(Hypers$Alpha$AAlpha)) stop('Hypers: "AAlpha" must be a scalar')
+      if (is.na(Hypers$Alpha$AAlpha)) stop('Hypers: "AAlpha" cannot be NA')
+      if (!is.finite(Hypers$Alpha$AAlpha)) stop('Hypers: "AAlpha" cannot be infinite')
+      if (!"BAlpha" %in% names(Hypers$Alpha)) stop('Hypers: "BAlpha" value missing')
+      if (!is.scalar(Hypers$Alpha$BAlpha)) stop('Hypers: "BAlpha" must be a scalar')
+      if (is.na(Hypers$Alpha$BAlpha)) stop('Hypers: "BAlpha" cannot be NA')
+      if (!is.finite(Hypers$Alpha$BAlpha)) stop('Hypers: "BAlpha" cannot be infinite')
+      if (Hypers$Alpha$AAlpha < 0) stop('Hypers: "AAlpha" must be non-negative')
+      if (Hypers$Alpha$BAlpha <= 0) stop('Hypers: "BAlpha" must be strictly positive')
+      if (Hypers$Alpha$BAlpha < Hypers$Alpha$AAlpha) stop('Hypers: "BAlpha" must be greater than "AAlpha"')
     }
 
   ###End Hyperparameters
@@ -146,33 +125,33 @@ CheckInputs <- function(Y, DM, W, Time, Starting, Hypers, Tuning, MCMC, Family, 
   ###Starting Values
   if (!is.null(Starting)) {
     if (!is.list(Starting)) stop('Starting must be a list')
-    if (!all(names(Starting) %in% c("Delta", "T", "Phi"))) stop('Starting: Can only contain objects with names "Delta", "T" and "Phi"')
+    if (!all(names(Starting) %in% c("Delta", "Sigma", "Alpha"))) stop('Starting: Can only contain objects with names "Delta", "Sigma" and "Alpha"')
 
     ###If delta starting values is provided
     if ("Delta" %in% names(Starting)) {
       if (!is.numeric(Starting$Delta)) stop('Starting: "Delta" must be a vector')
-      if (length(Starting$Delta) != 3) stop('Starting: "Delta" must be length 3')
+      if (length(Starting$Delta) != 5) stop('Starting: "Delta" must be length 5')
       if (!all(!is.na(Starting$Delta))) stop('Starting: "Delta" cannot have missing values')
       if (!all(is.finite(Starting$Delta))) stop('Starting: "Delta" cannot have infinite values')
     }
 
-    ###If T starting values is provided
-    if ("T" %in% names(Starting)) {
-      if (!is.matrix(Starting$T)) stop('Starting: "T" must be a matrix')
-      if (!dim(Starting$T)[1] == 3) stop('Starting: "T" must be 3 dimensional')
-      if (!dim(Starting$T)[2] == 3) stop('Starting: "T" must be square')
-      if (!all(!is.na(Starting$T))) stop('Starting: "T" cannot have missing values')
-      if (!all(is.finite(Starting$T))) stop('Starting: "T" cannot have infinite values')
-      if (sum( !( (Starting$T) == t(Starting$T) ) ) > 0) stop('Starting: "T" must be symmetric')
-      if ((det(Starting$T) - 0) < 0.00001) stop('Starting: "T" is close to singular')
+    ###If Sigma starting values is provided
+    if ("Sigma" %in% names(Starting)) {
+      if (!is.matrix(Starting$Sigma)) stop('Starting: "Sigma" must be a matrix')
+      if (!dim(Starting$Sigma)[1] == 5) stop('Starting: "Sigma" must be 5 dimensional')
+      if (!dim(Starting$Sigma)[2] == 5) stop('Starting: "Sigma" must be square')
+      if (!all(!is.na(Starting$Sigma))) stop('Starting: "Sigma" cannot have missing values')
+      if (!all(is.finite(Starting$Sigma))) stop('Starting: "Sigma" cannot have infinite values')
+      if (sum( !( (Starting$Sigma) == t(Starting$Sigma) ) ) > 0) stop('Starting: "Sigma" must be symmetric')
+      if ((det(Starting$Sigma) - 0) < 0.0000000001) stop('Starting: "Sigma" is close to singular')
     }
 
-    ###If phi starting values is provided
-    if ("Phi" %in% names(Starting)) {
-      if (!is.scalar(Starting$Phi)) stop('Starting: "Phi" must be a scalar')
-      if (is.na(Starting$Phi)) stop('Starting: "Phi" cannot be NA')
-      if (!is.finite(Starting$Phi)) stop('Starting: "Phi" cannot be infinite')
-      # I make sure that Phi is in [APhi, BPhi] in CreateHyPara();
+    ###If Alpha starting values is provided
+    if ("Alpha" %in% names(Starting)) {
+      if (!is.scalar(Starting$Alpha)) stop('Starting: "Alpha" must be a scalar')
+      if (is.na(Starting$Alpha)) stop('Starting: "Alpha" cannot be NA')
+      if (!is.finite(Starting$Alpha)) stop('Starting: "Alpha" cannot be infinite')
+      # I make sure that Alpha is in (AAlpha, BAlpha) in CreatePara();
     }
 
   ###End Starting Values
@@ -181,33 +160,41 @@ CheckInputs <- function(Y, DM, W, Time, Starting, Hypers, Tuning, MCMC, Family, 
   ###Tuning Values
   if (!is.null(Tuning)) {
     if (!is.list(Tuning)) stop('Tuning must be a list')
-    if (!all(names(Tuning) %in% c("Theta2", "Theta3", "Phi"))) stop('Tuning: Can only contain objects with names "Theta2", "Theta3" and "Phi"')
+    if (!all(names(Tuning) %in% c("Lambda0Vec", "Lambda1Vec", "EtaVec", "Alpha"))) stop('Tuning: Can only contain objects with names "Lambda0Vec", "Lambda1Vec", "EtaVec" or "Alpha"')
 
-    ###If theta2 tuning values are provided
-    if ("Theta2" %in% names(Tuning)) {
-      if (!is.numeric(Tuning$Theta2)) stop('Tuning: "Theta2" must be a vector')
-      if (length(Tuning$Theta2) != Nu) stop(paste0('Tuning: "Theta2" must have length ', Nu))
-      if (!all(!is.na(Tuning$Theta2))) stop('Tuning: "Theta2" cannot have missing values')
-      if (!all(is.finite(Tuning$Theta2))) stop('Tuning: "Theta2" cannot have infinite values')
-      if (any(Tuning$Theta2 < 0)) stop('Tuning: "Theta2" must have non-negative components')
+    ###If Lambda0Vec tuning values are provided
+    if ("Lambda0Vec" %in% names(Tuning)) {
+      if (!is.numeric(Tuning$Lambda0Vec)) stop('Tuning: "Lambda0Vec" must be a vector')
+      if (length(Tuning$Lambda0Vec) != M) stop(paste0('Tuning: "Lambda0Vec" must have length ', M))
+      if (!all(!is.na(Tuning$Lambda0Vec))) stop('Tuning: "Lambda0Vec" cannot have missing values')
+      if (!all(is.finite(Tuning$Lambda0Vec))) stop('Tuning: "Lambda0Vec" cannot have infinite values')
+      if (any(Tuning$Lambda0Vec < 0)) stop('Tuning: "Lambda0Vec" must have non-negative components')
     }
 
-    ###If theta3 tuning values are provided
-    if ("Theta3" %in% names(Tuning)) {
-      if (!"Theta3" %in% names(Tuning)) stop('Tuning: "Theta3" value missing')
-      if (!is.numeric(Tuning$Theta3)) stop('Tuning: "Theta3" must be a vector')
-      if (length(Tuning$Theta3) != Nu) stop(paste0('Tuning: "Theta3" must have length ', Nu))
-      if (!all(!is.na(Tuning$Theta3))) stop('Tuning: "Theta3" cannot have missing values')
-      if (!all(is.finite(Tuning$Theta3))) stop('Tuning: "Theta3" cannot have infinite values')
-      if (any(Tuning$Theta3 < 0)) stop('Tuning: "Theta3" must have non-negative components')
+    ###If Lambda1Vec tuning values are provided
+    if ("Lambda1Vec" %in% names(Tuning)) {
+      if (!is.numeric(Tuning$Lambda1Vec)) stop('Tuning: "Lambda1Vec" must be a vector')
+      if (length(Tuning$Lambda1Vec) != M) stop(paste0('Tuning: "Lambda1Vec" must have length ', M))
+      if (!all(!is.na(Tuning$Lambda1Vec))) stop('Tuning: "Lambda1Vec" cannot have missing values')
+      if (!all(is.finite(Tuning$Lambda1Vec))) stop('Tuning: "Lambda1Vec" cannot have infinite values')
+      if (any(Tuning$Lambda1Vec < 0)) stop('Tuning: "Lambda1Vec" must have non-negative components')
     }
 
-    ###If phi tuning value is provided
-    if ("Phi" %in% names(Tuning)) {
-      if (!is.scalar(Tuning$Phi)) stop('Tuning: "Phi" must be a scalar')
-      if (is.na(Tuning$Phi)) stop('Tuning: "Phi" cannot be NA')
-      if (!is.finite(Tuning$Phi)) stop('Tuning: "Phi" cannot be infinite')
-      if (Tuning$Phi < 0) stop('Tuning: "Phi" must be non-negative')
+    ###If EtaVec tuning values are provided
+    if ("EtaVec" %in% names(Tuning)) {
+      if (!is.numeric(Tuning$EtaVec)) stop('Tuning: "EtaVec" must be a vector')
+      if (length(Tuning$EtaVec) != M) stop(paste0('Tuning: "EtaVec" must have length ', M))
+      if (!all(!is.na(Tuning$EtaVec))) stop('Tuning: "EtaVec" cannot have missing values')
+      if (!all(is.finite(Tuning$EtaVec))) stop('Tuning: "EtaVec" cannot have infinite values')
+      if (any(Tuning$EtaVec < 0)) stop('Tuning: "EtaVec" must have non-negative components')
+    }
+
+    ###If Alpha tuning value is provided
+    if ("Alpha" %in% names(Tuning)) {
+      if (!is.scalar(Tuning$Alpha)) stop('Tuning: "Alpha" must be a scalar')
+      if (is.na(Tuning$Alpha)) stop('Tuning: "Alpha" cannot be NA')
+      if (!is.finite(Tuning$Alpha)) stop('Tuning: "Alpha" cannot be infinite')
+      if (Tuning$Alpha < 0) stop('Tuning: "Alpha" must be non-negative')
     }
 
   ###End Tuning Values
