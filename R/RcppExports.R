@@ -17,20 +17,36 @@ WAlphaFnc <- function(Alpha, DMLong, AdjacentEdgesBoolean, W, M, WeightsInd) {
     .Call('_spCP_WAlphaFnc', PACKAGE = 'spCP', Alpha, DMLong, AdjacentEdgesBoolean, W, M, WeightsInd)
 }
 
+CP_Rcpp <- function(DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_List, McmcObj_List, RawSamples, Interactive) {
+    .Call('_spCP_CP_Rcpp', PACKAGE = 'spCP', DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_List, McmcObj_List, RawSamples, Interactive)
+}
+
+spCP_lmc_Rcpp <- function(DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_List, McmcObj_List, RawSamples, Interactive) {
+    .Call('_spCP_spCP_lmc_Rcpp', PACKAGE = 'spCP', DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_List, McmcObj_List, RawSamples, Interactive)
+}
+
 spCP_Rcpp <- function(DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_List, McmcObj_List, RawSamples, Interactive) {
     .Call('_spCP_spCP_Rcpp', PACKAGE = 'spCP', DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_List, McmcObj_List, RawSamples, Interactive)
 }
 
-Test <- function() {
-    invisible(.Call('_spCP_Test', PACKAGE = 'spCP'))
+Test <- function(A) {
+    .Call('_spCP_Test', PACKAGE = 'spCP', A)
 }
 
 GetXThetaLoc <- function(ThetaLoc, Time, OneNu, Nu) {
     .Call('_spCP_GetXThetaLoc', PACKAGE = 'spCP', ThetaLoc, Time, OneNu, Nu)
 }
 
+GetXThetaLoc_lmc <- function(ThetaLoc, Time, OneNu, Nu) {
+    .Call('_spCP_GetXThetaLoc_lmc', PACKAGE = 'spCP', ThetaLoc, Time, OneNu, Nu)
+}
+
 CreatePhi <- function(Beta, Lambda, Eta, M) {
     .Call('_spCP_CreatePhi', PACKAGE = 'spCP', Beta, Lambda, Eta, M)
+}
+
+CreatePhi_lmc <- function(Beta0, Beta1, Lambda0, Lambda1, Eta, M) {
+    .Call('_spCP_CreatePhi_lmc', PACKAGE = 'spCP', Beta0, Beta1, Lambda0, Lambda1, Eta, M)
 }
 
 CholInv <- function(Cov) {

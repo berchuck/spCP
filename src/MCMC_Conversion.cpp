@@ -231,6 +231,3 @@ mcmcobj ConvertMcmcObj(Rcpp::List McmcObj_List) {
   McmcObj.BarLength = BarLength;
   return McmcObj;
 }
-
-
-

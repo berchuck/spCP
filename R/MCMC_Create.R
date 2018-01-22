@@ -450,3 +450,340 @@ CreateStorage <- function(DatObj, McmcObj) {
   return(Out)
 
 }
+
+
+
+###Function for reading in sampler inputs and creating a list object that contains all relavent data objects--------------------
+CreateDatObj_lmc <- function(Y, DM, W, Time, Rho, ScaleY, ScaleDM, Family, Weights, Distance) {
+
+  ###Data objects
+  YObserved <- Y / ScaleY #scale observed data
+  N <- length(YObserved)  #total observations
+  M <- dim(W)[1] #number of spatial locations
+  Nu <- N / M #number of visits
+
+  ###Dynamic Objects (updated with data augmentation)
+  YStar <- matrix(YObserved, ncol = 1)
+  YStarWide <- matrix(YStar, nrow = M, ncol = Nu)
+
+  ###Matrix Objects
+  OneM <- matrix(rep(1, M), nrow = M , ncol = 1)
+  OneNu <- matrix(rep(1, Nu), nrow = Nu, ncol = 1)
+  OneN <- matrix(rep(1, N), nrow = N, ncol = 1)
+  One5 <- matrix(rep(1, 5), nrow = 5, ncol = 1)
+  EyeM <- diag(M)
+  EyeNu <- diag(Nu)
+  EyeN <- diag(N)
+  Eye5 <- diag(5)
+  Eye5M <- diag(5 * M)
+
+  ###Create Z
+  if (Distance == "euclidean") Dist <- function(x, y) abs(x - y)
+  if (Distance == "circumference") Dist <- function(x, y) pmin(abs(x - y), (360 - pmax(x, y) + pmin(x, y))) #circumference of optic nerve
+  DM_Grid <- expand.grid(DM, DM)
+  DM_Vector <- Dist(DM_Grid[ , 1], DM_Grid[ , 2]) / ScaleDM
+  DM_Matrix <- matrix(DM_Vector, nrow = dim(W)[1], ncol = dim(W)[1], byrow = TRUE)
+  AdjacentEdgesBoolean <- (W == 1) & (!lower.tri(W))
+  DMLong <- matrix(DM_Matrix[AdjacentEdgesBoolean], ncol = 1)
+  AdjacentEdgesBoolean <- matrix(which(AdjacentEdgesBoolean) - 1, ncol = 1)
+
+  ###Weights indicator
+  if (Weights == "continuous") WeightsInd <- 0
+  if (Weights == "binary") WeightsInd <- 1
+
+  ###Family indicator
+  if (Family == "normal") FamilyInd <- 0
+  if (Family == "probit") FamilyInd <- 1
+  if (Family == "tobit") FamilyInd <- 2
+
+  ###Object for XTheta and XThetaLoc
+  XThetaLogical <- do.call(rbind, replicate(Nu, EyeM, simplify = FALSE))
+  XThetaInd <- which(XThetaLogical == 1, arr.ind = TRUE)
+  XThetaInd <- XThetaInd[order(XThetaInd[, 1]), ]
+
+  ###Delta matrix
+  ZDelta <- kronecker(Eye5, OneM)
+
+  ###Phi indeces
+  PhiIndeces <- matrix(1:(5 * M), ncol = 5)
+
+  ###Gamma indeces
+  GammaIndeces <- matrix(nrow = M * M, ncol = 5)
+  Gamma <- Eye5M
+  for (p in 1:5) {
+    Gamma[as.matrix(expand.grid(1:M + (p - 1) * M, 1:M + (p - 1) * M))] <- p
+  }
+  for (p in 1:5) {
+    GammaIndeces[, p] <- which(Gamma == p) - 1
+  }
+
+  ###Make parameters global
+  DatObj <- list()
+  DatObj$YObserved <- YObserved
+  DatObj$ScaleY <- ScaleY
+  DatObj$ScaleDM <- ScaleDM
+  DatObj$YStar <- YStar
+  DatObj$YStarWide <- YStarWide
+  DatObj$DM <- DM
+  DatObj$W <- W
+  DatObj$N <- N
+  DatObj$M <- M
+  DatObj$Nu <- Nu
+  DatObj$OneM <- OneM
+  DatObj$OneNu <- OneNu
+  DatObj$OneN <- OneN
+  DatObj$EyeM <- EyeM
+  DatObj$EyeNu <- EyeNu
+  DatObj$EyeN <- EyeN
+  DatObj$Eye5 <- Eye5
+  DatObj$Eye5M <- Eye5M
+  DatObj$DMLong <- DMLong
+  DatObj$AdjacentEdgesBoolean <- AdjacentEdgesBoolean
+  DatObj$FamilyInd <- FamilyInd
+  DatObj$WeightsInd <- WeightsInd
+  DatObj$Time <- Time
+  DatObj$TimeVec <- kronecker(Time, OneM)
+  DatObj$tNu <- max(Time)
+  DatObj$Rho <- Rho
+  DatObj$XThetaInd <- XThetaInd
+  DatObj$ZDelta <- ZDelta
+  DatObj$PhiIndeces <- PhiIndeces
+  DatObj$GammaIndeces <- GammaIndeces
+  return(DatObj)
+
+}
+
+
+
+
+###Function to create Hyperparameter Object------------------------------------------------------------------------------------
+CreateHyPara_lmc <- function(Hypers, DatObj) {
+
+  ###Set data objects
+  DMLong <- DatObj$DMLong
+
+  ###Which parameters are user defined?
+  UserHypers <- names(Hypers)
+
+  ###Set hyperparameters for Delta
+  if ("Delta" %in% UserHypers) {
+    Kappa2 <- Hypers$Delta$Kappa2
+  }
+  if (!("Delta" %in% UserHypers)) {
+    Kappa2 <- 1000
+  }
+
+  ###Set hyperparameters for Sigma
+  if ("Sigma" %in% UserHypers) {
+    Xi <- Hypers$Sigma$Xi
+    Psi <- Hypers$Sigma$Psi
+  }
+  if (!("Sigma" %in% UserHypers)) {
+    Xi <- 5 + 1
+    Psi <- diag(5)
+  }
+
+  ###Set hyperparameters for Alpha
+  if ("Alpha" %in% UserHypers) {
+    AAlpha <- Hypers$Alpha$AAlpha
+    BAlpha <- Hypers$Alpha$BAlpha
+  }
+  if (!("Alpha" %in% UserHypers)) {
+    BAlpha <- rep(-log(0.5) / min(DMLong[DMLong > 0]), 5)
+    AAlpha <- rep(-log(0.5) / max(DMLong), 5)
+  }
+
+  ###Create object for hyperparameters
+  HyPara <- list()
+  HyPara$Kappa2 <- Kappa2
+  HyPara$Xi <- Xi
+  HyPara$Psi <- Psi
+  HyPara$AAlpha <- AAlpha
+  HyPara$BAlpha <- BAlpha
+  return(HyPara)
+
+}
+
+
+
+###Function for creating an object containing relevant Metropolis information---------------------------------------------------
+CreateMetrObj_lmc <- function(Tuning, DatObj) {
+
+  ###Set Data Objects
+  M <- DatObj$M
+
+  ###Which parameters are user defined?
+  UserTuners <- names(Tuning)
+
+  ###Set tuning parameters for Beta0Vec
+  if ("Beta0Vec" %in% UserTuners) MetropBeta0Vec <- Tuning$Beta0Vec
+  if (!("Beta0Vec" %in% UserTuners)) MetropBeta0Vec <- rep(1, M)
+
+  ###Set tuning parameters for Beta1Vec
+  if ("Beta1Vec" %in% UserTuners) MetropBeta1Vec <- Tuning$Beta1Vec
+  if (!("Beta1Vec" %in% UserTuners)) MetropBeta1Vec <- rep(1, M)
+
+  ###Set tuning parameters for Lambda0Vec
+  if ("Lambda0Vec" %in% UserTuners) MetropLambda0Vec <- Tuning$Lambda0Vec
+  if (!("Lambda0Vec" %in% UserTuners)) MetropLambda0Vec <- rep(1, M)
+
+  ###Set tuning parameters for Lambda1Vec
+  if ("Lambda1Vec" %in% UserTuners) MetropLambda1Vec <- Tuning$Lambda1Vec
+  if (!("Lambda1Vec" %in% UserTuners)) MetropLambda1Vec <- rep(1, M)
+
+  ###Set tuning parameters for EtaVec
+  if ("EtaVec" %in% UserTuners) MetropEtaVec <- Tuning$EtaVec
+  if (!("EtaVec" %in% UserTuners)) MetropEtaVec <- rep(1, M)
+
+  ###Set tuning parameters for Sigma
+  if ("Sigma" %in% UserTuners) MetropSigma <- Tuning$Sigma
+  if (!("Sigma" %in% UserTuners)) MetropSigma <- rep(1, 15)
+
+  ###Set tuning parameters for Alpha
+  if ("Alpha" %in% UserTuners) MetropAlpha <- Tuning$Alpha
+  if (!("Alpha" %in% UserTuners)) MetropAlpha <- rep(1, 5)
+
+  ###Set acceptance rate counters
+  AcceptanceBeta0Vec <- AcceptanceBeta1Vec <- AcceptanceLambda0Vec <- AcceptanceLambda1Vec <- AcceptanceEtaVec <- rep(0, M)
+  AcceptanceAlpha <- rep(0, 5)
+  AcceptanceSigma <- rep(0, 15)
+
+  ###Return metropolis object
+  MetrObj <- list()
+  MetrObj$MetropBeta0Vec <- MetropBeta0Vec
+  MetrObj$AcceptanceBeta0Vec <- AcceptanceBeta0Vec
+  MetrObj$MetropBeta1Vec <- MetropBeta1Vec
+  MetrObj$AcceptanceBeta1Vec <- AcceptanceBeta1Vec
+  MetrObj$MetropLambda0Vec <- MetropLambda0Vec
+  MetrObj$AcceptanceLambda0Vec <- AcceptanceLambda0Vec
+  MetrObj$MetropLambda1Vec <- MetropLambda1Vec
+  MetrObj$AcceptanceLambda1Vec <- AcceptanceLambda1Vec
+  MetrObj$MetropEtaVec <- MetropEtaVec
+  MetrObj$AcceptanceEtaVec <- AcceptanceEtaVec
+  MetrObj$MetropSigma <- MetropSigma
+  MetrObj$AcceptanceSigma <- AcceptanceSigma
+  MetrObj$MetropAlpha <- MetropAlpha
+  MetrObj$AcceptanceAlpha <- AcceptanceAlpha
+  MetrObj$OriginalTuners <- c(MetropBeta0Vec, MetropBeta1Vec, MetropLambda0Vec, MetropLambda1Vec, MetropEtaVec, MetropSigma, MetropAlpha)
+  return(MetrObj)
+
+}
+
+
+
+###Function for creating inital parameter object-------------------------------------------------------------------------------
+CreatePara_lmc <- function(Starting, DatObj, HyPara) {
+
+  ###Set data objects
+  M <- DatObj$M
+  N <- DatObj$N
+  tNu <- DatObj$tNu
+  OneNu <- DatObj$OneNu
+  OneN <- DatObj$OneN
+  OneM <- DatObj$OneM
+  EyeM <- DatObj$EyeM
+  TimeVec <- DatObj$TimeVec
+  W <- DatObj$W
+  DMLong <- DatObj$DMLong
+  AdjacentEdgesBoolean <- DatObj$AdjacentEdgesBoolean
+  Rho <- DatObj$Rho
+  WeightsInd <- DatObj$WeightsInd
+  XThetaInd <- DatObj$XThetaInd
+  ZDelta <- DatObj$ZDelta
+
+  ###Set hyperparameter objects
+  AAlpha <- HyPara$AAlpha
+  BAlpha <- HyPara$BAlpha
+
+  ###Which parameters are user defined?
+  UserStarters <- names(Starting)
+
+  ###Set initial value of Sigma
+  if ("Sigma" %in% UserStarters) Sigma <- matrix(Starting$Sigma, nrow = 5, ncol = 5)
+  if (!("Sigma" %in% UserStarters)) Sigma <- diag(5)
+
+  ###Set initial values of Alpha
+  if ("Alpha" %in% UserStarters) Alpha <- Starting$Alpha
+  if ((!"Alpha" %in% UserStarters)) Alpha <- AAlpha + BAlpha / 2
+
+  ###Set initial values of Delta
+  if ("Delta" %in% UserStarters) Delta <- matrix(Starting$Delta, ncol = 1)
+  if ((!"Delta" %in% UserStarters)) Delta <- matrix(c(0, 0, 0, 0, 0), ncol = 1)
+
+  ###Set inital value of random effects
+  Beta0 <- matrix(0, nrow = M, ncol = 1)
+  Beta1 <- matrix(0, nrow = M, ncol = 1)
+  Lambda0 <- matrix(0, nrow = M, ncol = 1)
+  Lambda1 <- matrix(0, nrow = M, ncol = 1)
+  Eta <- matrix(0, nrow = M, ncol = 1)
+  Phi <- CreatePhi_lmc(Beta0, Beta1, Lambda0, Lambda1, Eta, M)
+
+  ###Initialize likelihood covariance objects
+  Gamma <- GammaInv <- matrix(0, nrow = M * 5, ncol = M * 5)
+  for (p in 1:5) {
+    Indeces <- as.matrix(expand.grid(1:M + (p - 1) * M, 1:M + (p - 1) * M))
+    WAlpha_p <- WAlphaFnc(Alpha[p], DMLong, AdjacentEdgesBoolean, W, M, WeightsInd)
+    GammaInv[Indeces] <- QInv_p <- QInvFnc(WAlpha_p, EyeM, Rho, M)
+    Gamma[Indeces] <- CholInv(QInv_p)
+  }
+  SigmaInv <- CholInv(Sigma)
+  A <- chol(Sigma)
+  PhiCov <- kronecker(A, EyeM) %*% GammaInv %*% kronecker(t(A), EyeM)
+  PhiPrec <- kronecker(solve(t(A)), EyeM) %*% Gamma %*% kronecker(solve(A), EyeM)
+  PhiMean <- ZDelta %*% Delta
+
+  ###Get Theta objects
+  Theta <- exp(Eta)
+  XTheta <- GetXTheta_lmc(Theta, XThetaInd, TimeVec, OneNu, OneN, tNu, N, M)
+
+  ###Joint likelihood objects
+  Mu <- kronecker(OneNu, Beta0) + XTheta %*% Beta1
+  Sigma2 <- exp(2 * (kronecker(OneNu, Lambda0) + XTheta %*% Lambda1))
+  Omega <- diag(as.numeric(Sigma2))
+  OmegaInv <- diag(as.numeric(1 / Sigma2))
+
+  ###Save parameter objects
+  Para <- list()
+  Para$Beta0 <- Beta0
+  Para$Beta1 <- Beta1
+  Para$Lambda0 <- Lambda0
+  Para$Lambda1 <- Lambda1
+  Para$Eta <- Eta
+  Para$Delta <- Delta
+  Para$Alpha <- Alpha
+  Para$Sigma <- Sigma
+  Para$Sigma2 <- Sigma2
+  Para$Omega <- Omega
+  Para$OmegaInv <- OmegaInv
+  Para$GammaInv <- GammaInv
+  Para$Gamma <- Gamma
+  Para$SigmaInv <- SigmaInv
+  Para$A <- A
+  Para$Theta <- Theta
+  Para$XTheta <- XTheta
+  Para$Mu <- Mu
+  Para$Phi <- Phi
+  Para$PhiMean <- PhiMean
+  Para$PhiPrec <- PhiPrec
+  Para$PhiCov <- PhiCov
+  return(Para)
+
+}
+
+
+
+###Function that creates a storage object for raw samples-----------------------------------------------------------------------
+CreateStorage_lmc <- function(DatObj, McmcObj) {
+
+  ###Set data objects
+  M <- DatObj$M
+
+  ###Set MCMC objects
+  NKeep <- McmcObj$NKeep
+
+  ###Create storage object
+  Out <- matrix(nrow = (5 + 15 + 5 + 5 * M), ncol = NKeep)
+  return(Out)
+
+}
+
