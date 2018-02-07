@@ -5,16 +5,16 @@
 //not for use by users.
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::export]]
-Rcpp::List spCP_Rcpp(Rcpp::List DatObj_List,  Rcpp::List HyPara_List,
-                     Rcpp::List MetrObj_List, Rcpp::List Para_List,
-                     Rcpp::List DatAug_List,  Rcpp::List McmcObj_List,
-                     arma::mat RawSamples, bool Interactive) {
+Rcpp::List spCP_lmc_Rcpp(Rcpp::List DatObj_List,  Rcpp::List HyPara_List,
+                         Rcpp::List MetrObj_List, Rcpp::List Para_List,
+                         Rcpp::List DatAug_List,  Rcpp::List McmcObj_List,
+                         arma::mat RawSamples, bool Interactive) {
 
   //Convet Rcpp::Lists to C++ structs
-  datobj DatObj = ConvertDatObj(DatObj_List);
-  hypara HyPara = ConvertHyPara(HyPara_List);
-  metrobj MetrObj = ConvertMetrObj(MetrObj_List);
-  para Para = ConvertPara(Para_List);
+  datobj_lmc DatObj = ConvertDatObj_lmc(DatObj_List);
+  hypara_lmc HyPara = ConvertHyPara_lmc(HyPara_List);
+  metrobj_lmc MetrObj = ConvertMetrObj_lmc(MetrObj_List);
+  para_lmc Para = ConvertPara_lmc(Para_List);
   dataug DatAug = ConvertDatAug(DatAug_List);
   mcmcobj McmcObj = ConvertMcmcObj(McmcObj_List);
 
@@ -28,57 +28,66 @@ Rcpp::List spCP_Rcpp(Rcpp::List DatObj_List,  Rcpp::List HyPara_List,
   arma::vec WhichBurnInProgress = McmcObj.WhichBurnInProgress;
   arma::vec WhichBurnInProgressInt = McmcObj.WhichBurnInProgressInt;
   arma::vec WhichSamplerProgress = McmcObj.WhichSamplerProgress;
-  std::pair<para, metrobj> Update;
+  std::pair<para_lmc, metrobj_lmc> Update;
 
   //User output
   BeginBurnInProgress(McmcObj, Interactive);
 
   //Begin MCMC Sampler
   for (int s = 1; s < NTotal + 1; s++) {
-  // for (int s = 1; s < 3; s++) {
+  // for (int s = 1; s < 2; s++) {
 
     //Check for user interrupt every 500 iterations
     if (s % 500 == 0) Rcpp::checkUserInterrupt();
 
     // Data Augmentation Step
-    if ((FamilyInd != 0) & (NTrunc > 0)) DatObj = SampleY(DatObj, Para, DatAug);
+    if ((FamilyInd != 0) & (NTrunc > 0)) DatObj = SampleY_lmc(DatObj, Para, DatAug);
 
     //Gibbs step for Delta
-    Para = SampleDelta(DatObj, Para, HyPara);
+    Para = SampleDelta_lmc(DatObj, Para, HyPara);
 
-    //Gibbs step for Beta (i.e. Beta0 and Beta1)
-    Para = SampleBeta(DatObj, Para);
+    //Metropolis step for Beta0
+    Update = SampleBeta0_lmc(DatObj, Para, MetrObj);
+    Para = Update.first;
+    MetrObj = Update.second;
+
+    //Metropolis step for Beta1
+    Update = SampleBeta1_lmc(DatObj, Para, MetrObj);
+    Para = Update.first;
+    MetrObj = Update.second;
 
     //Metropolis step for Lambda0
-    Update = SampleLambda0(DatObj, Para, MetrObj);
+    Update = SampleLambda0_lmc(DatObj, Para, MetrObj);
     Para = Update.first;
     MetrObj = Update.second;
 
     //Metropolis step for Lambda1
-    Update = SampleLambda1(DatObj, Para, MetrObj);
+    Update = SampleLambda1_lmc(DatObj, Para, MetrObj);
     Para = Update.first;
     MetrObj = Update.second;
 
     //Metropolis step for Eta
-    Update = SampleEta(DatObj, Para, MetrObj);
+    Update = SampleEta_lmc(DatObj, Para, MetrObj);
     Para = Update.first;
     MetrObj = Update.second;
 
-    //Gibbs sampler step for Sigma
-    Para = SampleSigma(DatObj, Para, HyPara);
+    //Metropolis sampler step for Sigma
+    Update = SampleSigma_lmc(DatObj, Para, HyPara, MetrObj);
+    Para = Update.first;
+    MetrObj = Update.second;
 
     //Metropolis step for Alpha
-    Update = SampleAlpha(DatObj, Para, HyPara, MetrObj);
+    Update = SampleAlpha_lmc(DatObj, Para, HyPara, MetrObj);
     Para = Update.first;
     MetrObj = Update.second;
 
     //Pilot adaptation
     if (std::find(WhichPilotAdapt.begin(), WhichPilotAdapt.end(), s) != WhichPilotAdapt.end())
-      MetrObj = PilotAdaptation(DatObj, MetrObj, McmcObj);
+      MetrObj = PilotAdaptation_lmc(DatObj, MetrObj, McmcObj);
 
     //Store raw samples
     if (std::find(WhichKeep.begin(), WhichKeep.end(), s) != WhichKeep.end())
-      RawSamples.cols(find(s == WhichKeep)) = StoreSamples(DatObj, Para);
+      RawSamples.cols(find(s == WhichKeep)) = StoreSamples_lmc(DatObj, Para);
 
     //Update burn-in progress bar
     if (Interactive) if (std::find(WhichBurnInProgress.begin(), WhichBurnInProgress.end(), s) != WhichBurnInProgress.end())
@@ -89,13 +98,13 @@ Rcpp::List spCP_Rcpp(Rcpp::List DatObj_List,  Rcpp::List HyPara_List,
     //Post burn-in progress
     if (s == NBurn) Rcpp::Rcout << std::fixed << "\nSampler progress:  0%..  ";
     if (std::find(WhichSamplerProgress.begin(), WhichSamplerProgress.end(), s) != WhichSamplerProgress.end())
-       SamplerProgress(s, McmcObj);
+      SamplerProgress(s, McmcObj);
 
-  //End MCMC Sampler
+    //End MCMC Sampler
   }
 
   //Output Metropolis object for summary
-  Rcpp::List Metropolis = OutputMetrObj(MetrObj);
+  Rcpp::List Metropolis = OutputMetrObj_lmc(MetrObj);
 
   //Return raw samples
   return Rcpp::List::create(Rcpp::Named("rawsamples") = RawSamples,

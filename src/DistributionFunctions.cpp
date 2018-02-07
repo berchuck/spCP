@@ -8,6 +8,13 @@ double lndMvn(arma::vec const& Y, arma::vec const& Mu, arma::mat const& Rooti){
 
 
 
+//Log density of a normal distribution
+double dlnorm(double x, double mu, double sigma2) {
+  return -0.5 * log(2 * M_PI * sigma2) - 0.5 * ((x - mu) * (x - mu)) / sigma2;
+}
+
+
+
 //Function for sampling random standard uniform variable-----------------------------------
 double randuRcpp() {
   return R::runif(0, 1);

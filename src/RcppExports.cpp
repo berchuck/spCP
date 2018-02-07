@@ -62,6 +62,174 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// GetLogLik
+arma::colvec GetLogLik(Rcpp::List DatObj_List, Rcpp::List Para_List, int NKeep);
+RcppExport SEXP _spCP_GetLogLik(SEXP DatObj_ListSEXP, SEXP Para_ListSEXP, SEXP NKeepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type DatObj_List(DatObj_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type Para_List(Para_ListSEXP);
+    Rcpp::traits::input_parameter< int >::type NKeep(NKeepSEXP);
+    rcpp_result_gen = Rcpp::wrap(GetLogLik(DatObj_List, Para_List, NKeep));
+    return rcpp_result_gen;
+END_RCPP
+}
+// GetLogLikMean
+double GetLogLikMean(Rcpp::List DatObj_List, Rcpp::List Para_List);
+RcppExport SEXP _spCP_GetLogLikMean(SEXP DatObj_ListSEXP, SEXP Para_ListSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type DatObj_List(DatObj_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type Para_List(Para_ListSEXP);
+    rcpp_result_gen = Rcpp::wrap(GetLogLikMean(DatObj_List, Para_List));
+    return rcpp_result_gen;
+END_RCPP
+}
+// GetLogLik_lmc
+arma::colvec GetLogLik_lmc(Rcpp::List DatObj_List, Rcpp::List Para_List, int NKeep);
+RcppExport SEXP _spCP_GetLogLik_lmc(SEXP DatObj_ListSEXP, SEXP Para_ListSEXP, SEXP NKeepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type DatObj_List(DatObj_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type Para_List(Para_ListSEXP);
+    Rcpp::traits::input_parameter< int >::type NKeep(NKeepSEXP);
+    rcpp_result_gen = Rcpp::wrap(GetLogLik_lmc(DatObj_List, Para_List, NKeep));
+    return rcpp_result_gen;
+END_RCPP
+}
+// GetLogLikMean_lmc
+double GetLogLikMean_lmc(Rcpp::List DatObj_List, Rcpp::List Para_List);
+RcppExport SEXP _spCP_GetLogLikMean_lmc(SEXP DatObj_ListSEXP, SEXP Para_ListSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type DatObj_List(DatObj_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type Para_List(Para_ListSEXP);
+    rcpp_result_gen = Rcpp::wrap(GetLogLikMean_lmc(DatObj_List, Para_List));
+    return rcpp_result_gen;
+END_RCPP
+}
+// GetLogLik_novar
+arma::colvec GetLogLik_novar(Rcpp::List DatObj_List, Rcpp::List Para_List, int NKeep);
+RcppExport SEXP _spCP_GetLogLik_novar(SEXP DatObj_ListSEXP, SEXP Para_ListSEXP, SEXP NKeepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type DatObj_List(DatObj_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type Para_List(Para_ListSEXP);
+    Rcpp::traits::input_parameter< int >::type NKeep(NKeepSEXP);
+    rcpp_result_gen = Rcpp::wrap(GetLogLik_novar(DatObj_List, Para_List, NKeep));
+    return rcpp_result_gen;
+END_RCPP
+}
+// GetLogLikMean_novar
+double GetLogLikMean_novar(Rcpp::List DatObj_List, Rcpp::List Para_List);
+RcppExport SEXP _spCP_GetLogLikMean_novar(SEXP DatObj_ListSEXP, SEXP Para_ListSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type DatObj_List(DatObj_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type Para_List(Para_ListSEXP);
+    rcpp_result_gen = Rcpp::wrap(GetLogLikMean_novar(DatObj_List, Para_List));
+    return rcpp_result_gen;
+END_RCPP
+}
+// SamplePPD
+arma::mat SamplePPD(Rcpp::List DatObj_List, Rcpp::List Para_List, int NKeep);
+RcppExport SEXP _spCP_SamplePPD(SEXP DatObj_ListSEXP, SEXP Para_ListSEXP, SEXP NKeepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type DatObj_List(DatObj_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type Para_List(Para_ListSEXP);
+    Rcpp::traits::input_parameter< int >::type NKeep(NKeepSEXP);
+    rcpp_result_gen = Rcpp::wrap(SamplePPD(DatObj_List, Para_List, NKeep));
+    return rcpp_result_gen;
+END_RCPP
+}
+// SamplePPD_lmc
+arma::mat SamplePPD_lmc(Rcpp::List DatObj_List, Rcpp::List Para_List, int NKeep);
+RcppExport SEXP _spCP_SamplePPD_lmc(SEXP DatObj_ListSEXP, SEXP Para_ListSEXP, SEXP NKeepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type DatObj_List(DatObj_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type Para_List(Para_ListSEXP);
+    Rcpp::traits::input_parameter< int >::type NKeep(NKeepSEXP);
+    rcpp_result_gen = Rcpp::wrap(SamplePPD_lmc(DatObj_List, Para_List, NKeep));
+    return rcpp_result_gen;
+END_RCPP
+}
+// SamplePPD_novar
+arma::mat SamplePPD_novar(Rcpp::List DatObj_List, Rcpp::List Para_List, int NKeep);
+RcppExport SEXP _spCP_SamplePPD_novar(SEXP DatObj_ListSEXP, SEXP Para_ListSEXP, SEXP NKeepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type DatObj_List(DatObj_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type Para_List(Para_ListSEXP);
+    Rcpp::traits::input_parameter< int >::type NKeep(NKeepSEXP);
+    rcpp_result_gen = Rcpp::wrap(SamplePPD_novar(DatObj_List, Para_List, NKeep));
+    return rcpp_result_gen;
+END_RCPP
+}
+// CP_Rcpp
+Rcpp::List CP_Rcpp(Rcpp::List DatObj_List, Rcpp::List HyPara_List, Rcpp::List MetrObj_List, Rcpp::List Para_List, Rcpp::List DatAug_List, Rcpp::List McmcObj_List, arma::mat RawSamples, bool Interactive);
+RcppExport SEXP _spCP_CP_Rcpp(SEXP DatObj_ListSEXP, SEXP HyPara_ListSEXP, SEXP MetrObj_ListSEXP, SEXP Para_ListSEXP, SEXP DatAug_ListSEXP, SEXP McmcObj_ListSEXP, SEXP RawSamplesSEXP, SEXP InteractiveSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type DatObj_List(DatObj_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type HyPara_List(HyPara_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type MetrObj_List(MetrObj_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type Para_List(Para_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type DatAug_List(DatAug_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type McmcObj_List(McmcObj_ListSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type RawSamples(RawSamplesSEXP);
+    Rcpp::traits::input_parameter< bool >::type Interactive(InteractiveSEXP);
+    rcpp_result_gen = Rcpp::wrap(CP_Rcpp(DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_List, McmcObj_List, RawSamples, Interactive));
+    return rcpp_result_gen;
+END_RCPP
+}
+// spCP_lmc_Rcpp
+Rcpp::List spCP_lmc_Rcpp(Rcpp::List DatObj_List, Rcpp::List HyPara_List, Rcpp::List MetrObj_List, Rcpp::List Para_List, Rcpp::List DatAug_List, Rcpp::List McmcObj_List, arma::mat RawSamples, bool Interactive);
+RcppExport SEXP _spCP_spCP_lmc_Rcpp(SEXP DatObj_ListSEXP, SEXP HyPara_ListSEXP, SEXP MetrObj_ListSEXP, SEXP Para_ListSEXP, SEXP DatAug_ListSEXP, SEXP McmcObj_ListSEXP, SEXP RawSamplesSEXP, SEXP InteractiveSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type DatObj_List(DatObj_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type HyPara_List(HyPara_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type MetrObj_List(MetrObj_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type Para_List(Para_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type DatAug_List(DatAug_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type McmcObj_List(McmcObj_ListSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type RawSamples(RawSamplesSEXP);
+    Rcpp::traits::input_parameter< bool >::type Interactive(InteractiveSEXP);
+    rcpp_result_gen = Rcpp::wrap(spCP_lmc_Rcpp(DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_List, McmcObj_List, RawSamples, Interactive));
+    return rcpp_result_gen;
+END_RCPP
+}
+// spCP_novar_Rcpp
+Rcpp::List spCP_novar_Rcpp(Rcpp::List DatObj_List, Rcpp::List HyPara_List, Rcpp::List MetrObj_List, Rcpp::List Para_List, Rcpp::List DatAug_List, Rcpp::List McmcObj_List, arma::mat RawSamples, bool Interactive);
+RcppExport SEXP _spCP_spCP_novar_Rcpp(SEXP DatObj_ListSEXP, SEXP HyPara_ListSEXP, SEXP MetrObj_ListSEXP, SEXP Para_ListSEXP, SEXP DatAug_ListSEXP, SEXP McmcObj_ListSEXP, SEXP RawSamplesSEXP, SEXP InteractiveSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type DatObj_List(DatObj_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type HyPara_List(HyPara_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type MetrObj_List(MetrObj_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type Para_List(Para_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type DatAug_List(DatAug_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type McmcObj_List(McmcObj_ListSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type RawSamples(RawSamplesSEXP);
+    Rcpp::traits::input_parameter< bool >::type Interactive(InteractiveSEXP);
+    rcpp_result_gen = Rcpp::wrap(spCP_novar_Rcpp(DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_List, McmcObj_List, RawSamples, Interactive));
+    return rcpp_result_gen;
+END_RCPP
+}
 // spCP_Rcpp
 Rcpp::List spCP_Rcpp(Rcpp::List DatObj_List, Rcpp::List HyPara_List, Rcpp::List MetrObj_List, Rcpp::List Para_List, Rcpp::List DatAug_List, Rcpp::List McmcObj_List, arma::mat RawSamples, bool Interactive);
 RcppExport SEXP _spCP_spCP_Rcpp(SEXP DatObj_ListSEXP, SEXP HyPara_ListSEXP, SEXP MetrObj_ListSEXP, SEXP Para_ListSEXP, SEXP DatAug_ListSEXP, SEXP McmcObj_ListSEXP, SEXP RawSamplesSEXP, SEXP InteractiveSEXP) {
@@ -89,6 +257,68 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// PredictFuture
+arma::cube PredictFuture(Rcpp::List DatObj_List, Rcpp::List Para_List, int NKeep);
+RcppExport SEXP _spCP_PredictFuture(SEXP DatObj_ListSEXP, SEXP Para_ListSEXP, SEXP NKeepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type DatObj_List(DatObj_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type Para_List(Para_ListSEXP);
+    Rcpp::traits::input_parameter< int >::type NKeep(NKeepSEXP);
+    rcpp_result_gen = Rcpp::wrap(PredictFuture(DatObj_List, Para_List, NKeep));
+    return rcpp_result_gen;
+END_RCPP
+}
+// PredictFuture_novar
+arma::cube PredictFuture_novar(Rcpp::List DatObj_List, Rcpp::List Para_List, int NKeep);
+RcppExport SEXP _spCP_PredictFuture_novar(SEXP DatObj_ListSEXP, SEXP Para_ListSEXP, SEXP NKeepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type DatObj_List(DatObj_ListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type Para_List(Para_ListSEXP);
+    Rcpp::traits::input_parameter< int >::type NKeep(NKeepSEXP);
+    rcpp_result_gen = Rcpp::wrap(PredictFuture_novar(DatObj_List, Para_List, NKeep));
+    return rcpp_result_gen;
+END_RCPP
+}
+// GetXTheta
+arma::mat GetXTheta(arma::vec const& Theta, arma::uvec const& XThetaInd, arma::vec const& TimeVec, arma::vec const& OneNu, arma::vec const& OneN, double tNu, int N, int M);
+RcppExport SEXP _spCP_GetXTheta(SEXP ThetaSEXP, SEXP XThetaIndSEXP, SEXP TimeVecSEXP, SEXP OneNuSEXP, SEXP OneNSEXP, SEXP tNuSEXP, SEXP NSEXP, SEXP MSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type Theta(ThetaSEXP);
+    Rcpp::traits::input_parameter< arma::uvec const& >::type XThetaInd(XThetaIndSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type TimeVec(TimeVecSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type OneNu(OneNuSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type OneN(OneNSEXP);
+    Rcpp::traits::input_parameter< double >::type tNu(tNuSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    Rcpp::traits::input_parameter< int >::type M(MSEXP);
+    rcpp_result_gen = Rcpp::wrap(GetXTheta(Theta, XThetaInd, TimeVec, OneNu, OneN, tNu, N, M));
+    return rcpp_result_gen;
+END_RCPP
+}
+// GetXTheta_lmc
+arma::mat GetXTheta_lmc(arma::vec const& Theta, arma::uvec const& XThetaInd, arma::vec const& TimeVec, arma::vec const& OneNu, arma::vec const& OneN, double tNu, int N, int M);
+RcppExport SEXP _spCP_GetXTheta_lmc(SEXP ThetaSEXP, SEXP XThetaIndSEXP, SEXP TimeVecSEXP, SEXP OneNuSEXP, SEXP OneNSEXP, SEXP tNuSEXP, SEXP NSEXP, SEXP MSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type Theta(ThetaSEXP);
+    Rcpp::traits::input_parameter< arma::uvec const& >::type XThetaInd(XThetaIndSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type TimeVec(TimeVecSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type OneNu(OneNuSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type OneN(OneNSEXP);
+    Rcpp::traits::input_parameter< double >::type tNu(tNuSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    Rcpp::traits::input_parameter< int >::type M(MSEXP);
+    rcpp_result_gen = Rcpp::wrap(GetXTheta_lmc(Theta, XThetaInd, TimeVec, OneNu, OneN, tNu, N, M));
+    return rcpp_result_gen;
+END_RCPP
+}
 // GetXThetaLoc
 arma::mat GetXThetaLoc(double ThetaLoc, arma::vec const& Time, arma::vec const& OneNu, int Nu);
 RcppExport SEXP _spCP_GetXThetaLoc(SEXP ThetaLocSEXP, SEXP TimeSEXP, SEXP OneNuSEXP, SEXP NuSEXP) {
@@ -103,6 +333,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// GetXThetaLoc_lmc
+arma::colvec GetXThetaLoc_lmc(double ThetaLoc, arma::vec const& Time, arma::vec const& OneNu, int Nu);
+RcppExport SEXP _spCP_GetXThetaLoc_lmc(SEXP ThetaLocSEXP, SEXP TimeSEXP, SEXP OneNuSEXP, SEXP NuSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type ThetaLoc(ThetaLocSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type Time(TimeSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type OneNu(OneNuSEXP);
+    Rcpp::traits::input_parameter< int >::type Nu(NuSEXP);
+    rcpp_result_gen = Rcpp::wrap(GetXThetaLoc_lmc(ThetaLoc, Time, OneNu, Nu));
+    return rcpp_result_gen;
+END_RCPP
+}
 // CreatePhi
 arma::vec CreatePhi(arma::vec const& Beta, arma::vec const& Lambda, arma::vec const& Eta, int M);
 RcppExport SEXP _spCP_CreatePhi(SEXP BetaSEXP, SEXP LambdaSEXP, SEXP EtaSEXP, SEXP MSEXP) {
@@ -114,6 +358,36 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec const& >::type Eta(EtaSEXP);
     Rcpp::traits::input_parameter< int >::type M(MSEXP);
     rcpp_result_gen = Rcpp::wrap(CreatePhi(Beta, Lambda, Eta, M));
+    return rcpp_result_gen;
+END_RCPP
+}
+// CreatePhi_lmc
+arma::vec CreatePhi_lmc(arma::vec const& Beta0, arma::vec const& Beta1, arma::vec const& Lambda0, arma::vec const& Lambda1, arma::vec const& Eta, int M);
+RcppExport SEXP _spCP_CreatePhi_lmc(SEXP Beta0SEXP, SEXP Beta1SEXP, SEXP Lambda0SEXP, SEXP Lambda1SEXP, SEXP EtaSEXP, SEXP MSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type Beta0(Beta0SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type Beta1(Beta1SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type Lambda0(Lambda0SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type Lambda1(Lambda1SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type Eta(EtaSEXP);
+    Rcpp::traits::input_parameter< int >::type M(MSEXP);
+    rcpp_result_gen = Rcpp::wrap(CreatePhi_lmc(Beta0, Beta1, Lambda0, Lambda1, Eta, M));
+    return rcpp_result_gen;
+END_RCPP
+}
+// CreatePhi_novar
+arma::vec CreatePhi_novar(arma::vec const& Beta, arma::vec const& Lambda, arma::vec const& Eta, int M);
+RcppExport SEXP _spCP_CreatePhi_novar(SEXP BetaSEXP, SEXP LambdaSEXP, SEXP EtaSEXP, SEXP MSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type Beta(BetaSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type Lambda(LambdaSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type Eta(EtaSEXP);
+    Rcpp::traits::input_parameter< int >::type M(MSEXP);
+    rcpp_result_gen = Rcpp::wrap(CreatePhi_novar(Beta, Lambda, Eta, M));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -156,10 +430,29 @@ static const R_CallMethodDef CallEntries[] = {
     {"_spCP_QInvFnc", (DL_FUNC) &_spCP_QInvFnc, 4},
     {"_spCP_QFnc", (DL_FUNC) &_spCP_QFnc, 4},
     {"_spCP_WAlphaFnc", (DL_FUNC) &_spCP_WAlphaFnc, 6},
+    {"_spCP_GetLogLik", (DL_FUNC) &_spCP_GetLogLik, 3},
+    {"_spCP_GetLogLikMean", (DL_FUNC) &_spCP_GetLogLikMean, 2},
+    {"_spCP_GetLogLik_lmc", (DL_FUNC) &_spCP_GetLogLik_lmc, 3},
+    {"_spCP_GetLogLikMean_lmc", (DL_FUNC) &_spCP_GetLogLikMean_lmc, 2},
+    {"_spCP_GetLogLik_novar", (DL_FUNC) &_spCP_GetLogLik_novar, 3},
+    {"_spCP_GetLogLikMean_novar", (DL_FUNC) &_spCP_GetLogLikMean_novar, 2},
+    {"_spCP_SamplePPD", (DL_FUNC) &_spCP_SamplePPD, 3},
+    {"_spCP_SamplePPD_lmc", (DL_FUNC) &_spCP_SamplePPD_lmc, 3},
+    {"_spCP_SamplePPD_novar", (DL_FUNC) &_spCP_SamplePPD_novar, 3},
+    {"_spCP_CP_Rcpp", (DL_FUNC) &_spCP_CP_Rcpp, 8},
+    {"_spCP_spCP_lmc_Rcpp", (DL_FUNC) &_spCP_spCP_lmc_Rcpp, 8},
+    {"_spCP_spCP_novar_Rcpp", (DL_FUNC) &_spCP_spCP_novar_Rcpp, 8},
     {"_spCP_spCP_Rcpp", (DL_FUNC) &_spCP_spCP_Rcpp, 8},
     {"_spCP_Test", (DL_FUNC) &_spCP_Test, 0},
+    {"_spCP_PredictFuture", (DL_FUNC) &_spCP_PredictFuture, 3},
+    {"_spCP_PredictFuture_novar", (DL_FUNC) &_spCP_PredictFuture_novar, 3},
+    {"_spCP_GetXTheta", (DL_FUNC) &_spCP_GetXTheta, 8},
+    {"_spCP_GetXTheta_lmc", (DL_FUNC) &_spCP_GetXTheta_lmc, 8},
     {"_spCP_GetXThetaLoc", (DL_FUNC) &_spCP_GetXThetaLoc, 4},
+    {"_spCP_GetXThetaLoc_lmc", (DL_FUNC) &_spCP_GetXThetaLoc_lmc, 4},
     {"_spCP_CreatePhi", (DL_FUNC) &_spCP_CreatePhi, 4},
+    {"_spCP_CreatePhi_lmc", (DL_FUNC) &_spCP_CreatePhi_lmc, 6},
+    {"_spCP_CreatePhi_novar", (DL_FUNC) &_spCP_CreatePhi_novar, 4},
     {"_spCP_CholInv", (DL_FUNC) &_spCP_CholInv, 1},
     {"_spCP_Inv3", (DL_FUNC) &_spCP_Inv3, 1},
     {"_spCP_makeSymm", (DL_FUNC) &_spCP_makeSymm, 1},

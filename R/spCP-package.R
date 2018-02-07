@@ -20,5 +20,7 @@
 #' @importFrom stats lm sd var
 #' @importFrom msm rtnorm
 #' @importFrom mvtnorm pmvnorm
+#' @importFrom graphics lines
+#' @importFrom stats quantile
 #' @useDynLib spCP
 NULL
