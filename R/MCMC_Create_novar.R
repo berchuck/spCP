@@ -1,5 +1,5 @@
 ###Function for reading in sampler inputs and creating a list object that contains all relavent data objects--------------------
-CreateDatObj <- function(Y, DM, W, Time, Rho, ScaleY, ScaleDM, Family, Weights, Distance) {
+CreateDatObj_novar <- function(Y, DM, W, Time, Rho, ScaleY, ScaleDM, Family, Weights, Distance) {
 
   ###Data objects
   YObserved <- Y / ScaleY #scale observed data
@@ -18,6 +18,8 @@ CreateDatObj <- function(Y, DM, W, Time, Rho, ScaleY, ScaleDM, Family, Weights, 
   EyeM <- diag(M)
   EyeNu <- diag(Nu)
   EyeN <- diag(N)
+  Eye4 <- diag(4)
+  Eye4M <- diag(4 * M)
   Eye5 <- diag(5)
   Eye5M <- diag(5 * M)
 
@@ -48,10 +50,10 @@ CreateDatObj <- function(Y, DM, W, Time, Rho, ScaleY, ScaleDM, Family, Weights, 
   XThetaInd <- XThetaInd[, 3] - 1
 
   ###Delta matrix
-  ZDelta <- kronecker(OneM, Eye5)
+  ZDelta <- kronecker(OneM, Eye4)
 
   ###Phi indeces
-  PhiIndeces <- t(matrix(1:(5 * M), ncol = 5, byrow = TRUE)) - 1
+  PhiIndeces <- t(matrix(1:(4 * M), ncol = 4, byrow = TRUE)) - 1
 
   ###Make parameters global
   DatObj <- list()
@@ -71,6 +73,8 @@ CreateDatObj <- function(Y, DM, W, Time, Rho, ScaleY, ScaleDM, Family, Weights, 
   DatObj$EyeM <- EyeM
   DatObj$EyeNu <- EyeNu
   DatObj$EyeN <- EyeN
+  DatObj$Eye4 <- Eye4
+  DatObj$Eye4M <- Eye4M
   DatObj$Eye5 <- Eye5
   DatObj$Eye5M <- Eye5M
   DatObj$DMLong <- DMLong
@@ -90,9 +94,8 @@ CreateDatObj <- function(Y, DM, W, Time, Rho, ScaleY, ScaleDM, Family, Weights, 
 
 
 
-
 ###Function to create Hyperparameter Object------------------------------------------------------------------------------------
-CreateHyPara <- function(Hypers, DatObj) {
+CreateHyPara_novar <- function(Hypers, DatObj) {
 
   ###Set data objects
   DMLong <- DatObj$DMLong
@@ -142,7 +145,7 @@ CreateHyPara <- function(Hypers, DatObj) {
 
 
 ###Function for creating an object containing relevant Metropolis information---------------------------------------------------
-CreateMetrObj <- function(Tuning, DatObj) {
+CreateMetrObj_novar <- function(Tuning, DatObj) {
 
   ###Set Data Objects
   M <- DatObj$M
@@ -151,12 +154,8 @@ CreateMetrObj <- function(Tuning, DatObj) {
   UserTuners <- names(Tuning)
 
   ###Set tuning parameters for Lambda0Vec
-  if ("Lambda0Vec" %in% UserTuners) MetropLambda0Vec <- Tuning$Lambda0Vec
-  if (!("Lambda0Vec" %in% UserTuners)) MetropLambda0Vec <- rep(1, M)
-
-  ###Set tuning parameters for Lambda1Vec
-  if ("Lambda1Vec" %in% UserTuners) MetropLambda1Vec <- Tuning$Lambda1Vec
-  if (!("Lambda1Vec" %in% UserTuners)) MetropLambda1Vec <- rep(1, M)
+  if ("LambdaVec" %in% UserTuners) MetropLambdaVec <- Tuning$LambdaVec
+  if (!("LambdaVec" %in% UserTuners)) MetropLambdaVec <- rep(1, M)
 
   ###Set tuning parameters for EtaVec
   if ("EtaVec" %in% UserTuners) MetropEtaVec <- Tuning$EtaVec
@@ -167,20 +166,22 @@ CreateMetrObj <- function(Tuning, DatObj) {
   if (!("Alpha" %in% UserTuners)) MetropAlpha <- 1
 
   ###Set acceptance rate counters
-  AcceptanceLambda0Vec <- AcceptanceLambda1Vec <- AcceptanceEtaVec <- rep(0, M)
+  AcceptanceLambdaVec <- AcceptanceEtaVec <- rep(0, M)
   AcceptanceAlpha <- 0
 
   ###Return metropolis object
   MetrObj <- list()
-  MetrObj$MetropLambda0Vec <- MetropLambda0Vec
-  MetrObj$AcceptanceLambda0Vec <- AcceptanceLambda0Vec
-  MetrObj$MetropLambda1Vec <- MetropLambda1Vec
-  MetrObj$AcceptanceLambda1Vec <- AcceptanceLambda1Vec
+  MetrObj$MetropLambda0Vec <- 1
+  MetrObj$AcceptanceLambda0Vec <- 1
+  MetrObj$MetropLambda1Vec <- 0
+  MetrObj$AcceptanceLambda1Vec <- 0
+  MetrObj$MetropLambdaVec <- MetropLambdaVec
+  MetrObj$AcceptanceLambdaVec <- AcceptanceLambdaVec
   MetrObj$MetropEtaVec <- MetropEtaVec
   MetrObj$AcceptanceEtaVec <- AcceptanceEtaVec
   MetrObj$MetropAlpha <- MetropAlpha
   MetrObj$AcceptanceAlpha <- AcceptanceAlpha
-  MetrObj$OriginalTuners <- c(MetropLambda0Vec, MetropLambda1Vec, MetropEtaVec, MetropAlpha)
+  MetrObj$OriginalTuners <- c(MetropLambdaVec, MetropEtaVec, MetropAlpha)
   return(MetrObj)
 
 }
@@ -188,7 +189,7 @@ CreateMetrObj <- function(Tuning, DatObj) {
 
 
 ###Function for creating inital parameter object-------------------------------------------------------------------------------
-CreatePara <- function(Starting, DatObj, HyPara) {
+CreatePara_novar <- function(Starting, DatObj, HyPara) {
 
   ###Set data objects
   M <- DatObj$M
@@ -198,6 +199,7 @@ CreatePara <- function(Starting, DatObj, HyPara) {
   OneN <- DatObj$OneN
   OneM <- DatObj$OneM
   EyeM <- DatObj$EyeM
+  EyeNu <- DatObj$EyeNu
   TimeVec <- DatObj$TimeVec
   W <- DatObj$W
   DMLong <- DatObj$DMLong
@@ -214,25 +216,22 @@ CreatePara <- function(Starting, DatObj, HyPara) {
   UserStarters <- names(Starting)
 
   ###Set initial value of Sigma
-  if ("Sigma" %in% UserStarters) Sigma <- matrix(Starting$Sigma, nrow = 5, ncol = 5)
-  if (!("Sigma" %in% UserStarters)) Sigma <- diag(5)
+  if ("Sigma" %in% UserStarters) Sigma <- matrix(Starting$Sigma, nrow = 4, ncol = 4)
+  if (!("Sigma" %in% UserStarters)) Sigma <- diag(4)
 
   ###Set initial values of Alpha
-  if ("Alpha" %in% UserStarters) {
-    Alpha <- Starting$Alpha
-    if ((Alpha <= AAlpha) | (Alpha >= BAlpha)) stop('Starting: "Alpha" must be in (AAlpha, BAlpha)')
-  }
+  if ("Alpha" %in% UserStarters) Alpha <- Starting$Alpha
   if ((!"Alpha" %in% UserStarters)) Alpha <- mean(c(AAlpha, BAlpha))
 
   ###Set initial values of Delta
   if ("Delta" %in% UserStarters) Delta <- matrix(Starting$Delta, ncol = 1)
-  if ((!"Delta" %in% UserStarters)) Delta <- matrix(c(0, 0, 0, 0, 0), ncol = 1)
+  if ((!"Delta" %in% UserStarters)) Delta <- matrix(c(0, 0, 0, 0), ncol = 1)
 
   ###Set inital value of random effects
   Beta <- matrix(rep(0, 2 * M), ncol = 1)
-  Lambda <- matrix(rep(0, 2 * M), ncol = 1)
+  Lambda <- matrix(rep(0, M), ncol = 1)
   Eta <- matrix(rep(0, M), ncol = 1)
-  Phi <- CreatePhi(Beta, Lambda, Eta, M)
+  Phi <- CreatePhi_novar(Beta, Lambda, Eta, M)
 
   ###Initialize likelihood covariance objects
   WAlpha <- WAlphaFnc(Alpha, DMLong, AdjacentEdgesBoolean, W, M, WeightsInd)
@@ -246,9 +245,9 @@ CreatePara <- function(Starting, DatObj, HyPara) {
 
   ###Joint likelihood objects
   Mu <- XTheta %*% Beta
-  Sigma2 <- exp(2 * (XTheta %*% Lambda))
-  Omega <- diag(as.numeric(Sigma2))
-  OmegaInv <- diag(as.numeric(1 / Sigma2))
+  Sigma2 <- exp(2 * Lambda)
+  Omega <- kronecker(EyeNu, diag(as.numeric(Sigma2)))
+  OmegaInv <- kronecker(EyeNu, diag(as.numeric(1 / Sigma2)))
 
   ###Save parameter objects
   Para <- list()
@@ -279,7 +278,7 @@ CreatePara <- function(Starting, DatObj, HyPara) {
 
 
 ###Function that creates the data augmentation (i.e. Tobit) booleans------------------------------------------------------------
-CreateDatAug <- function(DatObj) {
+CreateDatAug_novar <- function(DatObj) {
 
   ###Set data object
   YObserved <- DatObj$YObserved
@@ -375,7 +374,7 @@ CreateDatAug <- function(DatObj) {
 
 
 ###Function that creates inputs for MCMC sampler--------------------------------------------------------------------------------
-CreateMcmc <- function(MCMC, DatObj) {
+CreateMcmc_novar <- function(MCMC, DatObj) {
 
   ###Which parameters are user defined?
   UserMCMC <- names(MCMC)
@@ -437,7 +436,7 @@ CreateMcmc <- function(MCMC, DatObj) {
 
 
 ###Function that creates a storage object for raw samples-----------------------------------------------------------------------
-CreateStorage <- function(DatObj, McmcObj) {
+CreateStorage_novar <- function(DatObj, McmcObj) {
 
   ###Set data objects
   M <- DatObj$M
@@ -446,10 +445,7 @@ CreateStorage <- function(DatObj, McmcObj) {
   NKeep <- McmcObj$NKeep
 
   ###Create storage object
-  Out <- matrix(nrow = (5 + 15 + 1 + 5 * M), ncol = NKeep)
+  Out <- matrix(nrow = (4 + 10 + 1 + 4 * M), ncol = NKeep)
   return(Out)
 
 }
-
-
-

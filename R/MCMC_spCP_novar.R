@@ -1,9 +1,8 @@
-#' MCMC sampler for spatially varying change point model with LMC.
+#' MCMC sampler for spatially varying change point model.
 #'
-#' \code{spCP_lmc} is a Markov chain Monte Carlo (MCMC) sampler for a spatially varying change point
+#' \code{spCP_novar} is a Markov chain Monte Carlo (MCMC) sampler for a spatially varying change point
 #'  model with spatially varying slopes, intercepts, and unique variances at each spatialtemporal
-#'  location. The spatial effects are induced using the linear model of co-regionalization.
-#'  The model is implemented using the Bayesian hierarchical framework.
+#'  location. The model is implemented using the Bayesian hierarchical framework.
 #'
 #' @param Y An \code{N} dimensional vector containing the observed outcome data.
 #'  Here, \code{N = M * Nu}, where \code{M} represents the number of spatial locations
@@ -28,8 +27,7 @@
 #'  When \code{NULL} is chosen then default starting values are automatically generated.
 #'  Otherwise a \code{list} must be provided with names \code{Delta}, \code{Alpha} or
 #'  \code{Sigma} containing appropriate objects. \code{Delta} must be a \code{5} dimensional
-#'  vector, \code{Sigma} a \code{5 x 5} dimensional matrix and \code{Alpha} a \code{5}
-#'  dimensional vector.
+#'  vector, \code{Sigma} a \code{5 x 5} dimensional matrix and \code{Alpha} a scalar.
 #'
 #' @param Hypers Either \code{NULL} or a \code{list} containing hyperparameter values
 #'  to be specified for the MCMC sampler. If \code{NULL} is not chosen then none, some or all
@@ -48,21 +46,18 @@
 #'  the scale matrix and must be a \code{5 x 5} dimensional positive definite matrix.
 #'
 #'  \code{Alpha} is a \code{list} with two objects, \code{AAlpha} and \code{BAlpha}. \code{AAlpha}
-#'  represents the lower bound for the uniform hyperprior and is \code{5} dimensional vector,
-#'  while \code{BAlpha} represents the upper bound and is a \code{5} dimensional vector.
-#'  The bounds must be specified carefully.
+#'  represents the lower bound for the uniform hyperprior, while \code{BAlpha} represents
+#'  the upper bound. The bounds must be specified carefully.
 #'
 #' @param Tuning Either \code{NULL} or a \code{list} containing tuning values
 #'  to be specified for the MCMC Metropolis steps. If \code{NULL} is not chosen then all
 #'  of the tuning values must be specified.
 #'
 #'  When \code{NULL} is chosen then default tuning values are automatically generated to
-#'  \code{1}. Otherwise a \code{list} must be provided with names \code{Beta0Vec}, \code{Beta1Vec},
-#'  \code{Lambda0Vec}, \code{Lambda1Vec}, \code{EtaVec}, \code{Sigma} and \code{Alpha}.
-#'  \code{Beta0Vec}, \code{Beta1Vec}, \code{Lambda0Vec}, \code{Lambda1Vec}, and \code{EtaVec}
-#'  must be \code{M} dimensional vectors, \code{Sigma} a \code{15} dimensional vector and
-#'  \code{Alpha} a 5 dimensional vector. Each containing tuning variances for their
-#'   corresponding Metropolis updates.
+#'  \code{1}. Otherwise a \code{list} must be provided with names \code{Lambda0Vec},
+#'  \code{Lambda1Vec}, \code{EtaVec} and \code{Alpha}. \code{Lambda0Vec}, \code{Lambda1Vec},
+#'  and \code{EtaVec} must be \code{M} dimensional vectors and \code{Alpha} a scalar.
+#'  Each containing tuning variances for their corresponding Metropolis updates.
 #'
 #' @param MCMC Either \code{NULL} or a \code{list} containing input values to be used
 #'  for implementing the MCMC sampler. If \code{NULL} is not chosen then all
@@ -104,7 +99,7 @@
 #' @param Seed An integer value used to set the seed for the random number generator
 #'  (default = 54).
 #'
-#' @details Details of the underlying statistical model proposed by
+#' @details Details of the underlying statistical model proposed by proposed by
 #'  Berchuck et al. 2018. are forthcoming.
 #'
 #' @return \code{STBDwDM} returns a list containing the following objects
@@ -136,9 +131,9 @@
 #'   columns have names that describe the samples within them. The row is listed first, e.g.,
 #'   \code{Sigma32} refers to the entry in row \code{3}, column \code{2}.}
 #'
-#'   \item{\code{alpha}}{\code{NKeep x 5} \code{matrix} of posterior samples for \code{Alpha}.}
+#'   \item{\code{alpha}}{\code{NKeep x 1} \code{matrix} of posterior samples for \code{Alpha}.}
 #'
-#'   \item{\code{metropolis}}{\code{(5 * M + 5 + 15) x 3} \code{matrix} of metropolis
+#'   \item{\code{metropolis}}{\code{(3 * M + 1) x 3} \code{matrix} of metropolis
 #'   acceptance rates, updated tuners, and original tuners that result from the pilot
 #'   adaptation. The first \code{M} correspond to the \code{Lambda0Vec} parameters,
 #'   the next \code{M} correspond to the \code{Lambda1Vec}, the next \code{M} correspond
@@ -157,9 +152,9 @@
 #' @author Samuel I. Berchuck
 #' @references Reference for Berchuck et al. 2018 is forthcoming.
 #' @export
-spCP_lmc <- function(Y, DM, W, Time, Starting = NULL, Hypers = NULL, Tuning = NULL, MCMC = NULL,
-                     Family = "tobit", Weights = "continuous", Distance = "circumference",
-                     Rho = 0.99, ScaleY = 10, ScaleDM = 100, Seed = 54) {
+spCP_novar <- function(Y, DM, W, Time, Starting = NULL, Hypers = NULL, Tuning = NULL, MCMC = NULL,
+                       Family = "tobit", Weights = "continuous", Distance = "circumference",
+                       Rho = 0.99, ScaleY = 10, ScaleDM = 100, Seed = 54) {
 
   ###Function Inputs
   # Y = Y
@@ -174,8 +169,8 @@ spCP_lmc <- function(Y, DM, W, Time, Starting = NULL, Hypers = NULL, Tuning = NU
   # Weights = "continuous"
   # Distance = "circumference"
   # Rho = 0.99
-  # ScaleY = 10
-  # ScaleDM = 100
+  # ScaleY = 1
+  # ScaleDM = 1
   # Seed = 54
 
   ###Check for missing objects
@@ -185,10 +180,7 @@ spCP_lmc <- function(Y, DM, W, Time, Starting = NULL, Hypers = NULL, Tuning = NU
   if (missing(Time)) stop("Time: missing")
 
   ###Check model inputs
-  # CheckInputs_lmc(Y, DM, W, Time, Starting, Hypers, Tuning, MCMC, Family, Distance, Weights, Rho, ScaleY, ScaleDM)
-
-  ###Options
-  options(CBoundsCheck = TRUE)
+  # CheckInputs(Y, DM, W, Time, Starting, Hypers, Tuning, MCMC, Family, Distance, Weights, Rho, ScaleY, ScaleDM)
 
   ####Set seed for reproducibility
   set.seed(Seed)
@@ -197,19 +189,19 @@ spCP_lmc <- function(Y, DM, W, Time, Starting = NULL, Hypers = NULL, Tuning = NU
   Interactive <- interactive()
 
   ###Create objects for use in sampler
-  DatObj <- CreateDatObj_lmc(Y, DM, W, Time, Rho, ScaleY, ScaleDM, Family, Weights, Distance)
-  HyPara <- CreateHyPara_lmc(Hypers, DatObj)
-  MetrObj <- CreateMetrObj_lmc(Tuning, DatObj)
-  Para <- CreatePara_lmc(Starting, DatObj, HyPara)
-  DatAug <- CreateDatAug_lmc(DatObj)
-  McmcObj <- CreateMcmc_lmc(MCMC, DatObj)
-  RawSamples <- CreateStorage_lmc(DatObj, McmcObj)
+  DatObj <- CreateDatObj_novar(Y, DM, W, Time, Rho, ScaleY, ScaleDM, Family, Weights, Distance)
+  HyPara <- CreateHyPara_novar(Hypers, DatObj)
+  MetrObj <- CreateMetrObj_novar(Tuning, DatObj)
+  Para <- CreatePara_novar(Starting, DatObj, HyPara)
+  DatAug <- CreateDatAug(DatObj)
+  McmcObj <- CreateMcmc(MCMC, DatObj)
+  RawSamples <- CreateStorage_novar(DatObj, McmcObj)
 
   ###Time MCMC sampler
   BeginTime <- Sys.time()
 
   ###Run MCMC sampler in Rcpp
-  RegObj <- spCP_lmc_Rcpp(DatObj, HyPara, MetrObj, Para, DatAug, McmcObj, RawSamples, Interactive)
+  RegObj <- spCP_novar_Rcpp(DatObj, HyPara, MetrObj, Para, DatAug, McmcObj, RawSamples, Interactive)
 
   ###Set regression objects
   RawSamples <- RegObj$rawsamples
@@ -222,25 +214,24 @@ spCP_lmc <- function(Y, DM, W, Time, Starting = NULL, Hypers = NULL, Tuning = NU
   ###Collect output to be returned
   DatObjOut <- OutputDatObj(DatObj)
   DatAugOut <- OutputDatAug(DatAug)
-  Metropolis <- SummarizeMetropolis_lms(DatObj, MetrObj, MetropRcpp, McmcObj)
-  Samples <- FormatSamples_lms(DatObj, RawSamples)
+  Metropolis <- SummarizeMetropolis_novar(DatObj, MetrObj, MetropRcpp, McmcObj)
+  Samples <- FormatSamples_novar(DatObj, RawSamples)
 
   ###Return spBDwDM object
-  spCP_lmc <- list(alpha = Samples$Alpha,
-                   delta = Samples$Delta,
-                   sigma = Samples$Sigma,
-                   beta0 = Samples$Beta0,
-                   beta1 = Samples$Beta1,
-                   lambda0 = Samples$Lambda0,
-                   lambda1 = Samples$Lambda1,
-                   eta = Samples$Eta,
-                   theta = Samples$Theta,
-                   metropolis = Metropolis,
-                   datobj = DatObjOut,
-                   dataug = DatAugOut,
-                   runtime = paste0("Model runtime: ",round(RunTime, 2), " ",attr(RunTime, "units")))
-  spCP_lmc <- structure(spCP_lmc, class = "spCP_lmc")
-  return(spCP_lmc)
+  spCP_novar <- list(alpha = Samples$Alpha,
+                     delta = Samples$Delta,
+                     sigma = Samples$Sigma,
+                     beta0 = Samples$Beta0,
+                     beta1 = Samples$Beta1,
+                     lambda = Samples$Lambda,
+                     eta = Samples$Eta,
+                     theta = Samples$Theta,
+                     metropolis = Metropolis,
+                     datobj = DatObjOut,
+                     dataug = DatAugOut,
+                     runtime = paste0("Model runtime: ",round(RunTime, 2), " ",attr(RunTime, "units")))
+  spCP_novar <- structure(spCP_novar, class = "spCP_novar")
+  return(spCP_novar)
 
-###End sampler
+  ###End sampler
 }
