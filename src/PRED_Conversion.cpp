@@ -8,6 +8,7 @@ datobjPRED ConvertDatObjPRED(Rcpp::List DatObj_List) {
   double Rho = DatObj_List["Rho"];
   double ScaleY = DatObj_List["ScaleY"];
   double ScaleDM = DatObj_List["ScaleDM"];
+  double t1 = DatObj_List["t1"];
   double tNu = DatObj_List["tNu"];
   int M = DatObj_List["M"];
   int Nu = DatObj_List["Nu"];
@@ -42,6 +43,7 @@ datobjPRED ConvertDatObjPRED(Rcpp::List DatObj_List) {
   DatObj.EyeM = EyeM;
   DatObj.NNewTimes = NNewTimes;
   DatObj.NewTimes = NewTimes;
+  DatObj.t1 = t1;
   DatObj.tNu = tNu;
   DatObj.TimeVec = TimeVec;
   DatObj.XThetaInd = XThetaInd;

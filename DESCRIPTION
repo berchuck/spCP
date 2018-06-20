@@ -1,11 +1,20 @@
 Package: spCP
 Type: Package
-Title: Spatially varying change points
+Title: Spatially Varying Change Points
 Version: 1.0
-Date: 2017-09-12
-Authors@R: person("Samuel I.", "Berchuck", email = "berchuck@ad.unc.edu", role = c("aut", "cre"))
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Date: 2018-06-12
+Authors@R: person("Samuel I.", "Berchuck", email = "sib2@duke.edu", role = c("aut", "cre"))
+Description: Implements a spatially varying change point model with 
+    unique intercepts, slopes, variance intercepts and slopes, and 
+    change points at each location. Inference is within the 
+    Bayesian setting using Markov chain Monte Carlo (MCMC). The 
+    response variable can be modeled as Gaussian (no nugget), 
+    probit or Tobit link and the five spatially varying parameter
+    are modeled jointly using a multivariate conditional 
+    autoregressive (MCAR) prior. The MCAR is a unique process that
+    allows for a dissimilarity metric to dictate the local spatial 
+    dependencies. Full details of the package can be found in the accompanying 
+    vignette. 
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
@@ -13,6 +22,6 @@ RoxygenNote: 5.0.1
 NeedsCompilation: yes
 Depends: R (>= 3.0.2)
 Imports: graphics, grDevices, msm (>= 1.0.0), mvtnorm (>= 1.0-0), Rcpp (>= 0.12.9), stats, utils
-Suggests: coda, classInt, knitr, rmarkdown
+Suggests: coda, classInt, knitr, rmarkdown, womblR (>= 1.0.3)
 LinkingTo: Rcpp, RcppArmadillo (>= 0.7.500.0.0)
 VignetteBuilder: knitr

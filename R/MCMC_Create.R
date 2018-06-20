@@ -79,6 +79,7 @@ CreateDatObj <- function(Y, DM, W, Time, Rho, ScaleY, ScaleDM, Family, Weights, 
   DatObj$WeightsInd <- WeightsInd
   DatObj$Time <- Time
   DatObj$TimeVec <- kronecker(Time, OneM)
+  DatObj$t1 <- min(Time)
   DatObj$tNu <- max(Time)
   DatObj$Rho <- Rho
   DatObj$XThetaInd <- XThetaInd
@@ -193,6 +194,7 @@ CreatePara <- function(Starting, DatObj, HyPara) {
   ###Set data objects
   M <- DatObj$M
   N <- DatObj$N
+  t1 <- DatObj$t1
   tNu <- DatObj$tNu
   OneNu <- DatObj$OneNu
   OneN <- DatObj$OneN
@@ -241,7 +243,7 @@ CreatePara <- function(Starting, DatObj, HyPara) {
   SigmaInv <- CholInv(Sigma)
 
   ###Get Theta objects
-  Theta <- exp(Eta)
+  Theta <- pmax(pmin(Eta, tNu), t1)
   XTheta <- GetXTheta(Theta, XThetaInd, TimeVec, OneNu, OneN, tNu, N, M)
 
   ###Joint likelihood objects

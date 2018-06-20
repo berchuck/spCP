@@ -5,6 +5,7 @@ FormatSamples <- function(DatObj, RawSamples) {
   M <- DatObj$M
   PhiIndeces <- DatObj$PhiIndeces
   tNu <- DatObj$tNu
+  t1 <- DatObj$t1
 
   ###Format raw samples
   RawSamples <- t(RawSamples)
@@ -17,7 +18,7 @@ FormatSamples <- function(DatObj, RawSamples) {
   Lambda0 <- Phi[, PhiIndeces[3, ] + 1]
   Lambda1 <- Phi[, PhiIndeces[4, ] + 1]
   Eta <- Phi[, PhiIndeces[5, ] + 1]
-  Theta <- apply(Eta, 2, function(x) pmin(tNu, exp(x)))
+  Theta <- apply(Eta, 2, function(x) pmax(pmin(x, tNu), t1))
   colnames(Alpha) <- "Alpha"
   colnames(Delta) <- paste0("Delta", 1:5)
   colnames(Sigma) <- c(paste0("Sigma", 1:5, "1"), paste0("Sigma", 2:5, "2"), paste0("Sigma", 3:5, "3"), paste0("Sigma", 4:5, "4"), "Sigma55")
@@ -57,6 +58,7 @@ OutputDatObj <- function(DatObj) {
                     TimeVec = DatObj$TimeVec,
                     YObserved = DatObj$YObserved,
                     tNu = DatObj$tNu,
+                    t1 = DatObj$t1,
                     XThetaInd = DatObj$XThetaInd,
                     N = DatObj$N,
                     EyeN = DatObj$EyeN)
@@ -128,22 +130,3 @@ SummarizeMetropolis <- function(DatObj, MetrObj, MetropRcpp, McmcObj) {
 is.spCP <- function(x) {
   identical(attributes(x)$class, "spCP")
 }
-
-
-
-###Verify the class of our regression object------------------------------------------------------------------------
-#' is.CP
-#'
-#' \code{is.CP} is a general test of an object being interpretable as a
-#' \code{\link{CP}} object.
-#'
-#' @param x object to be tested.
-#'
-#' @details The \code{\link{CP}} class is defined as the regression object that
-#'  results from the \code{\link{CP}} regression function.
-#'
-#' @export
-is.CP <- function(x) {
-  identical(attributes(x)$class, "CP")
-}
-

@@ -11,6 +11,7 @@ struct datobjPRED {
   double ScaleY;
   double ScaleDM;
   double tNu;
+  double t1;
   int M;
   int Nu;
   int FamilyInd;

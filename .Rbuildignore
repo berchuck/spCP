@@ -1,3 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^README\.md$
+^spCP-example\.pdf$
+^cran-comments\.md$
+^NEWS\.md$

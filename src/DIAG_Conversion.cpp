@@ -6,6 +6,7 @@ datobjDIAG ConvertDatObjDIAG(Rcpp::List DatObj_List) {
 
   //Set objects from List
   double tNu = DatObj_List["tNu"];
+  double t1 = DatObj_List["t1"];
   double ScaleY = DatObj_List["ScaleY"];
   double ScaleDM = DatObj_List["ScaleDM"];
   int M = DatObj_List["M"];
@@ -39,6 +40,7 @@ datobjDIAG ConvertDatObjDIAG(Rcpp::List DatObj_List) {
   DatObj.OneM = OneM;
   DatObj.EyeM = EyeM;
   DatObj.tNu = tNu;
+  DatObj.t1 = t1;
   DatObj.XThetaInd = XThetaInd;
   DatObj.N = N;
   DatObj.EyeNu = EyeNu;

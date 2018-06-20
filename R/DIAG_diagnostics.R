@@ -45,360 +45,119 @@
 #' @export
 diagnostics <- function(obj, diags = c("dic", "dinf", "waic"), keepDeviance = FALSE, keepPPD = FALSE) {
 
-  ###Check class of model
-  if (all(c(!is.spCP(obj), !is.CP(obj), !is.spCP_lmc(obj), !is.spCP_novar(obj)))) stop('"obj" must be of class "spCP", "CP", "spCP_lmc", or "spCP_novar"')
+  ###Check Inputs
+  if (!is.spCP(obj)) stop('"obj" must be of class "spCP"')
+  if (missing(obj)) stop('"obj" is missing')
+  if (sum((!diags %in% c("dic", "dinf", "waic"))) > 0) stop('"diags" must contain at least one of "dic", "dinf" or "waic"')
+  if (!is.logical(keepDeviance)) stop('"keepDeviance" must be a logical')
+  if (!is.logical(keepPPD)) stop('"keepPPD" must be a logical')
 
-  ###Models spCP and CP
-  if (is.spCP(obj) | is.CP(obj)) {
+  ###Unload STBDwDM objects
+  DatObj <- obj$datobj
+  DatAug <- obj$dataug
 
-    ###Check Inputs
-    if (missing(obj)) stop('"obj" is missing')
-    if (sum((!diags %in% c("dic", "dinf", "waic"))) > 0) stop('"diags" must contain at least one of "dic", "dinf" or "waic"')
-    if (!is.logical(keepDeviance)) stop('"keepDeviance" must be a logical')
-    if (!is.logical(keepPPD)) stop('"keepPPD" must be a logical')
+  ###Set seed for reproducibility
+  set.seed(54)
 
-    ###Unload STBDwDM objects
-    DatObj <- obj$datobj
-    DatAug <- obj$dataug
+  ###Set data objects
+  OneM <- DatObj$OneM
+  tNu <- DatObj$tNu
+  t1 <- DatObj$t1
+  XThetaInd <- DatObj$XThetaInd
+  TimeVec <- DatObj$TimeVec
+  OneNu <- DatObj$OneNu
+  OneN <- DatObj$OneN
+  N <- DatObj$N
+  M <- DatObj$M
+  YObserved <- DatObj$YObserved
 
-    ###Set seed for reproducibility
-    set.seed(54)
+  ###Construct parameter object
+  Para <- list()
+  Para$Beta0 <- obj$beta0
+  Para$Beta1 <- obj$beta1
+  Para$Lambda0 <- obj$lambda0
+  Para$Lambda1 <- obj$lambda1
+  Para$Eta <- obj$eta
+  Beta0Mean <- apply(Para$Beta0, 2, median)
+  Beta1Mean <- apply(Para$Beta1, 2, median)
+  BetaMean <- matrix(rbind(Beta0Mean, Beta1Mean), ncol = 1)
+  Lambda0Mean <- apply(Para$Lambda0, 2, median)
+  Lambda1Mean <- apply(Para$Lambda1, 2, median)
+  LambdaMean <- matrix(rbind(Lambda0Mean, Lambda1Mean), ncol = 1)
+  EtaMean <- apply(Para$Eta, 2, median)
+  ThetaMean <- pmax(pmin(tNu * OneM, EtaMean), t1 * OneM)
+  XThetaMean = GetXTheta(ThetaMean, XThetaInd, TimeVec, OneNu, OneN, tNu, N, M)
+  MuMean = XThetaMean %*% BetaMean;
+  Sigma2Mean = exp(2 * (XThetaMean %*% LambdaMean));
+  Para$MuMean <- MuMean
+  Para$Sigma2Mean <- Sigma2Mean
 
-    ###Set data objects
-    OneM <- DatObj$OneM
-    tNu <- DatObj$tNu
-    XThetaInd <- DatObj$XThetaInd
-    TimeVec <- DatObj$TimeVec
-    OneNu <- DatObj$OneNu
-    OneN <- DatObj$OneN
-    N <- DatObj$N
-    M <- DatObj$M
-    YObserved <- DatObj$YObserved
+  ###Set mcmc object
+  NKeep <- dim(obj$delta)[1]
 
-    ###Construct parameter object
-    Para <- list()
-    Para$Beta0 <- obj$beta0
-    Para$Beta1 <- obj$beta1
-    Para$Lambda0 <- obj$lambda0
-    Para$Lambda1 <- obj$lambda1
-    Para$Eta <- obj$eta
-    Beta0Mean <- apply(Para$Beta0, 2, mean)
-    Beta1Mean <- apply(Para$Beta1, 2, mean)
-    BetaMean <- matrix(rbind(Beta0Mean, Beta1Mean), ncol = 1)
-    Lambda0Mean <- apply(Para$Lambda0, 2, mean)
-    Lambda1Mean <- apply(Para$Lambda1, 2, mean)
-    LambdaMean <- matrix(rbind(Lambda0Mean, Lambda1Mean), ncol = 1)
-    EtaMean <- apply(Para$Eta, 2, mean)
-    ThetaMean <- pmin(tNu * OneM, exp(EtaMean))
-    XThetaMean = GetXTheta(ThetaMean, XThetaInd, TimeVec, OneNu, OneN, tNu, N, M)
-    MuMean = XThetaMean %*% BetaMean;
-    Sigma2Mean = exp(2 * (XThetaMean %*% LambdaMean));
-    Para$MuMean <- MuMean
-    Para$Sigma2Mean <- Sigma2Mean
+  ###Compute Log-likelihood using Rcpp function GetLogLik
+  LogLik <- NULL
+  if (("dic" %in% diags) | ("waic" %in% diags)) {
 
-    ###Set mcmc object
-    NKeep <- dim(obj$delta)[1]
+    ###Compute log-likelihood
+    requireNamespace("mvtnorm", quietly = TRUE) #Requred for pmvnorm in Rcpp function
+    LogLik <- GetLogLik(DatObj, Para, NKeep)
 
-    ###Compute Log-likelihood using Rcpp function GetLogLik
-    LogLik <- NULL
-    if (("dic" %in% diags) | ("waic" %in% diags)) {
-
-      ###Compute log-likelihood
-      requireNamespace("mvtnorm", quietly = TRUE) #Requred for pmvnorm in Rcpp function
-      LogLik <- GetLogLik(DatObj, Para, NKeep)
-
-    }
-
-    ###Compute DIC diagnostics
-    dic <- NULL
-    if ("dic" %in% diags) {
-
-      ###Compute mean log-likelihood
-      LogLikMean <- GetLogLikMean(DatObj, Para)
-
-      ###Calculate DIC objects
-      DBar <- -2 * mean(LogLik)
-      DHat <- -2 * LogLikMean
-      pD <- DBar - DHat
-      DIC <- DBar + pD
-      dic <- list(dic = DIC, pd = pD)
-
-    }
-
-    ###Compute PPD diagnostics
-    ppd <- PPD <- NULL
-    if ("dinf" %in% diags) {
-
-      ###Get PPD
-      PPD <- SamplePPD(DatObj, Para, NKeep)
-
-      ###Compute PPD Diagnostics
-      PPDMean <- apply(PPD, 1, mean)
-      PPDVar <- apply(PPD, 1, var)
-      P <- sum(PPDVar)
-      G <- sum( (PPDMean - YObserved) ^ 2)
-      DInf <- G + P
-      ppd <- list(p = P, g = G, dinf = DInf)
-
-    }
-
-    ###Compute WAIC diagnostics
-    waic <- NULL
-    if ("waic" %in% diags) {
-
-      ###Get WAIC
-      # The calculation of Waic!  Returns lppd, p_waic_1, p_waic_2, and waic, which we define
-      # as 2*(lppd - p_waic_2), as recommmended in BDA
-      lppd <- log( apply(exp(LogLik), 2, mean) )
-      p_waic_1 <- 2 * (lppd - apply(LogLik, 2, mean) )
-      p_waic_2 <- apply(LogLik, 2, var)
-      waic <- -2 * lppd + 2 * p_waic_2
-      waic <- list(waic = waic, p_waic = p_waic_2, lppd = lppd, p_waic_1 = p_waic_1)
-
-    }
-
-    ###Output diagnostics
-    if (!keepDeviance & !keepPPD) diags <- list(dic = dic, dinf = ppd, waic = waic)
-    if (!keepDeviance & keepPPD) diags <- list(dic = dic, dinf = ppd, waic = waic, PPD = t(PPD))
-    if (keepDeviance & !keepPPD) diags <- list(dic = dic, dinf = ppd, waic = waic, deviance = -2 * LogLik)
-    if (keepDeviance & keepPPD) diags <- list(dic = dic, dinf = ppd, waic = waic, deviance = -2 * LogLik, PPD = t(PPD))
-
-  ###End spCP and CP models
   }
 
-  ###Begin spCP_lmc model
-  if (is.spCP_lmc(obj)) {
+  ###Compute DIC diagnostics
+  dic <- NULL
+  if ("dic" %in% diags) {
 
-    ###Check Inputs
-    if (missing(obj)) stop('"obj" is missing')
-    if (sum((!diags %in% c("dic", "dinf", "waic"))) > 0) stop('"diags" must contain at least one of "dic", "dinf" or "waic"')
-    if (!is.logical(keepDeviance)) stop('"keepDeviance" must be a logical')
-    if (!is.logical(keepPPD)) stop('"keepPPD" must be a logical')
+    ###Compute mean log-likelihood
+    LogLikMean <- GetLogLikMean(DatObj, Para)
 
-    ###Unload STBDwDM objects
-    DatObj <- obj$datobj
-    DatAug <- obj$dataug
+    ###Calculate DIC objects
+    DBar <- -2 * mean(LogLik)
+    DHat <- -2 * LogLikMean
+    pD <- DBar - DHat
+    DIC <- DBar + pD
+    dic <- list(dic = DIC, pd = pD)
 
-    ###Set seed for reproducibility
-    set.seed(54)
-
-    ###Set data objects
-    OneM <- DatObj$OneM
-    tNu <- DatObj$tNu
-    XThetaInd <- DatObj$XThetaInd
-    TimeVec <- DatObj$TimeVec
-    OneNu <- DatObj$OneNu
-    OneN <- DatObj$OneN
-    N <- DatObj$N
-    M <- DatObj$M
-    YObserved <- DatObj$YObserved
-
-    ###Construct parameter object
-    Para <- list()
-    Para$Beta0 <- obj$beta0
-    Para$Beta1 <- obj$beta1
-    Para$Lambda0 <- obj$lambda0
-    Para$Lambda1 <- obj$lambda1
-    Para$Eta <- obj$eta
-    Beta0Mean <- apply(Para$Beta0, 2, mean)
-    Beta1Mean <- apply(Para$Beta1, 2, mean)
-    Lambda0Mean <- apply(Para$Lambda0, 2, mean)
-    Lambda1Mean <- apply(Para$Lambda1, 2, mean)
-    EtaMean <- apply(Para$Eta, 2, mean)
-    ThetaMean <- pmin(tNu * OneM, exp(EtaMean))
-    XThetaMean = GetXTheta_lmc(ThetaMean, XThetaInd, TimeVec, OneNu, OneN, tNu, N, M)
-    MuMean = kronecker(OneNu, Beta0Mean) + XThetaMean %*% Beta1Mean;
-    Sigma2Mean = exp(2 * (kronecker(OneNu, Lambda0Mean) + XThetaMean %*% Lambda1Mean));
-    Para$MuMean <- MuMean
-    Para$Sigma2Mean <- Sigma2Mean
-
-    ###Set mcmc object
-    NKeep <- dim(obj$delta)[1]
-
-    ###Compute Log-likelihood using Rcpp function GetLogLik
-    LogLik <- NULL
-    if (("dic" %in% diags) | ("waic" %in% diags)) {
-
-      ###Compute log-likelihood
-      requireNamespace("mvtnorm", quietly = TRUE) #Requred for pmvnorm in Rcpp function
-      LogLik <- GetLogLik_lmc(DatObj, Para, NKeep)
-
-    }
-
-    ###Compute DIC diagnostics
-    dic <- NULL
-    if ("dic" %in% diags) {
-
-      ###Compute mean log-likelihood
-      LogLikMean <- GetLogLikMean_lmc(DatObj, Para)
-
-      ###Calculate DIC objects
-      DBar <- -2 * mean(LogLik)
-      DHat <- -2 * LogLikMean
-      pD <- DBar - DHat
-      DIC <- DBar + pD
-      dic <- list(dic = DIC, pd = pD)
-
-    }
-
-    ###Compute PPD diagnostics
-    ppd <- PPD <- NULL
-    if ("dinf" %in% diags) {
-
-      ###Get PPD
-      PPD <- SamplePPD_lmc(DatObj, Para, NKeep)
-
-      ###Compute PPD Diagnostics
-      PPDMean <- apply(PPD, 1, mean)
-      PPDVar <- apply(PPD, 1, var)
-      P <- sum(PPDVar)
-      G <- sum( (PPDMean - YObserved) ^ 2)
-      DInf <- G + P
-      ppd <- list(p = P, g = G, dinf = DInf)
-
-    }
-
-    ###Compute WAIC diagnostics
-    waic <- NULL
-    if ("waic" %in% diags) {
-
-      ###Get WAIC
-      # The calculation of Waic!  Returns lppd, p_waic_1, p_waic_2, and waic, which we define
-      # as 2*(lppd - p_waic_2), as recommmended in BDA
-      lppd <- log( apply(exp(LogLik), 2, mean) )
-      p_waic_1 <- 2 * (lppd - apply(LogLik, 2, mean) )
-      p_waic_2 <- apply(LogLik, 2, var)
-      waic <- -2 * lppd + 2 * p_waic_2
-      waic <- list(waic = waic, p_waic = p_waic_2, lppd = lppd, p_waic_1 = p_waic_1)
-
-    }
-
-    ###Output diagnostics
-    if (!keepDeviance & !keepPPD) diags <- list(dic = dic, dinf = ppd, waic = waic)
-    if (!keepDeviance & keepPPD) diags <- list(dic = dic, dinf = ppd, waic = waic, PPD = t(PPD))
-    if (keepDeviance & !keepPPD) diags <- list(dic = dic, dinf = ppd, waic = waic, deviance = -2 * LogLik)
-    if (keepDeviance & keepPPD) diags <- list(dic = dic, dinf = ppd, waic = waic, deviance = -2 * LogLik, PPD = t(PPD))
-
-  ###End spCP_lmc model
   }
 
-  ###Begin spCP_novar model
-  if (is.spCP_novar(obj)) {
+  ###Compute PPD diagnostics
+  ppd <- PPD <- NULL
+  if ("dinf" %in% diags) {
 
-    ###Check Inputs
-    if (missing(obj)) stop('"obj" is missing')
-    if (sum((!diags %in% c("dic", "dinf", "waic"))) > 0) stop('"diags" must contain at least one of "dic", "dinf" or "waic"')
-    if (!is.logical(keepDeviance)) stop('"keepDeviance" must be a logical')
-    if (!is.logical(keepPPD)) stop('"keepPPD" must be a logical')
+    ###Get PPD
+    PPD <- SamplePPD(DatObj, Para, NKeep)
 
-    ###Unload STBDwDM objects
-    DatObj <- obj$datobj
-    DatAug <- obj$dataug
+    ###Compute PPD Diagnostics
+    PPDMean <- apply(PPD, 1, mean)
+    PPDVar <- apply(PPD, 1, var)
+    P <- sum(PPDVar)
+    G <- sum( (PPDMean - YObserved) ^ 2)
+    DInf <- G + P
+    ppd <- list(p = P, g = G, dinf = DInf)
 
-    ###Set seed for reproducibility
-    set.seed(54)
-
-    ###Set data objects
-    OneM <- DatObj$OneM
-    tNu <- DatObj$tNu
-    XThetaInd <- DatObj$XThetaInd
-    TimeVec <- DatObj$TimeVec
-    OneNu <- DatObj$OneNu
-    OneN <- DatObj$OneN
-    N <- DatObj$N
-    M <- DatObj$M
-    EyeNu <- DatObj$EyeNu
-    YObserved <- DatObj$YObserved
-
-    ###Construct parameter object
-    Para <- list()
-    Para$Beta0 <- obj$beta0
-    Para$Beta1 <- obj$beta1
-    Para$Lambda0 <- obj$lambda
-    Para$Lambda1 <- obj$lambda
-    Para$Eta <- obj$eta
-    Beta0Mean <- apply(Para$Beta0, 2, mean)
-    Beta1Mean <- apply(Para$Beta1, 2, mean)
-    BetaMean <- matrix(rbind(Beta0Mean, Beta1Mean), ncol = 1)
-    LambdaMean <- apply(Para$Lambda0, 2, mean)
-    EtaMean <- apply(Para$Eta, 2, mean)
-    ThetaMean <- pmin(tNu * OneM, exp(EtaMean))
-    XThetaMean = GetXTheta(ThetaMean, XThetaInd, TimeVec, OneNu, OneN, tNu, N, M)
-    MuMean = XThetaMean %*% BetaMean;
-    Sigma2Mean = exp(2 * (LambdaMean));
-    Para$MuMean <- MuMean
-    Para$Sigma2Mean <- kronecker(OneNu, Sigma2Mean)
-
-    ###Set mcmc object
-    NKeep <- dim(obj$delta)[1]
-
-    ###Compute Log-likelihood using Rcpp function GetLogLik
-    LogLik <- NULL
-    if (("dic" %in% diags) | ("waic" %in% diags)) {
-
-      ###Compute log-likelihood
-      requireNamespace("mvtnorm", quietly = TRUE) #Requred for pmvnorm in Rcpp function
-      LogLik <- GetLogLik_novar(DatObj, Para, NKeep)
-
-    }
-
-    ###Compute DIC diagnostics
-    dic <- NULL
-    if ("dic" %in% diags) {
-
-      ###Compute mean log-likelihood
-      LogLikMean <- GetLogLikMean_novar(DatObj, Para)
-
-      ###Calculate DIC objects
-      DBar <- -2 * mean(LogLik)
-      DHat <- -2 * LogLikMean
-      pD <- DBar - DHat
-      DIC <- DBar + pD
-      dic <- list(dic = DIC, pd = pD)
-
-    }
-
-    ###Compute PPD diagnostics
-    ppd <- PPD <- NULL
-    if ("dinf" %in% diags) {
-
-      ###Get PPD
-      PPD <- SamplePPD_novar(DatObj, Para, NKeep)
-
-      ###Compute PPD Diagnostics
-      PPDMean <- apply(PPD, 1, mean)
-      PPDVar <- apply(PPD, 1, var)
-      P <- sum(PPDVar)
-      G <- sum( (PPDMean - YObserved) ^ 2)
-      DInf <- G + P
-      ppd <- list(p = P, g = G, dinf = DInf)
-
-    }
-
-    ###Compute WAIC diagnostics
-    waic <- NULL
-    if ("waic" %in% diags) {
-
-      ###Get WAIC
-      # The calculation of Waic!  Returns lppd, p_waic_1, p_waic_2, and waic, which we define
-      # as 2*(lppd - p_waic_2), as recommmended in BDA
-      lppd <- log( apply(exp(LogLik), 2, mean) )
-      p_waic_1 <- 2 * (lppd - apply(LogLik, 2, mean) )
-      p_waic_2 <- apply(LogLik, 2, var)
-      waic <- -2 * lppd + 2 * p_waic_2
-      waic <- list(waic = waic, p_waic = p_waic_2, lppd = lppd, p_waic_1 = p_waic_1)
-
-    }
-
-    ###Output diagnostics
-    if (!keepDeviance & !keepPPD) diags <- list(dic = dic, dinf = ppd, waic = waic)
-    if (!keepDeviance & keepPPD) diags <- list(dic = dic, dinf = ppd, waic = waic, PPD = t(PPD))
-    if (keepDeviance & !keepPPD) diags <- list(dic = dic, dinf = ppd, waic = waic, deviance = -2 * LogLik)
-    if (keepDeviance & keepPPD) diags <- list(dic = dic, dinf = ppd, waic = waic, deviance = -2 * LogLik, PPD = t(PPD))
-
-    ###End spCP_lmc model
   }
 
+  ###Compute WAIC diagnostics
+  waic <- NULL
+  if ("waic" %in% diags) {
+
+    ###Get WAIC
+    # The calculation of Waic!  Returns lppd, p_waic_1, p_waic_2, and waic, which we define
+    # as 2*(lppd - p_waic_2), as recommmended in BDA
+    lppd <- log( apply(exp(LogLik), 2, mean) )
+    p_waic_1 <- 2 * (lppd - apply(LogLik, 2, mean) )
+    p_waic_2 <- apply(LogLik, 2, var)
+    waic <- -2 * lppd + 2 * p_waic_2
+    waic <- list(waic = waic, p_waic = p_waic_2, lppd = lppd, p_waic_1 = p_waic_1)
+
+  }
+
+  ###Output diagnostics
+  if (!keepDeviance & !keepPPD) diags <- list(dic = dic, dinf = ppd, waic = waic)
+  if (!keepDeviance & keepPPD) diags <- list(dic = dic, dinf = ppd, waic = waic, PPD = t(PPD))
+  if (keepDeviance & !keepPPD) diags <- list(dic = dic, dinf = ppd, waic = waic, deviance = -2 * LogLik)
+  if (keepDeviance & keepPPD) diags <- list(dic = dic, dinf = ppd, waic = waic, deviance = -2 * LogLik, PPD = t(PPD))
   return(diags)
 
 }

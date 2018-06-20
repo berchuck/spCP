@@ -92,26 +92,7 @@ double rtnormRcpp(double mean, double sd, bool Above) {
   else return sd * qnormRcpp(RandU - pnormRcpp(ScaledMean) * (RandU - 1)) + mean;
 
 }
-arma::vec rtnormRcppMSM(int N, arma::vec const& mean, arma::vec const& sd, double lower, double upper) {
-
-  //Set truncated normal function
-  // Rcpp::Environment msm("package:msm"); //this is equivalent to library(msm)
-  Rcpp::Environment msm = Rcpp::Environment::namespace_env("msm"); //This is equivalent to PACKAGE::FUNCTION()
-  Rcpp::Function rtnorm = msm["rtnorm"];
-
-  //Evaluate pmvnorm
-  SEXP rtnormSEXP;
-  rtnormSEXP = rtnorm(Rcpp::Named("n", N),
-                      Rcpp::Named("mean", mean),
-                      Rcpp::Named("sd", sd),
-                      Rcpp::Named("lower", lower),
-                      Rcpp::Named("upper", upper));
-
-  //Convert output to double
-  return Rcpp::as<arma::vec>(rtnormSEXP);
-
-}
-// double rtnormRcppMSM(double mean, double sd, double lower, double upper) {
+// arma::vec rtnormRcppMSM(int N, arma::vec const& mean, arma::vec const& sd, double lower, double upper) {
 //
 //   //Set truncated normal function
 //   // Rcpp::Environment msm("package:msm"); //this is equivalent to library(msm)
@@ -120,16 +101,35 @@ arma::vec rtnormRcppMSM(int N, arma::vec const& mean, arma::vec const& sd, doubl
 //
 //   //Evaluate pmvnorm
 //   SEXP rtnormSEXP;
-//   rtnormSEXP = rtnorm(Rcpp::Named("n", 1),
+//   rtnormSEXP = rtnorm(Rcpp::Named("n", N),
 //                       Rcpp::Named("mean", mean),
 //                       Rcpp::Named("sd", sd),
 //                       Rcpp::Named("lower", lower),
 //                       Rcpp::Named("upper", upper));
 //
 //   //Convert output to double
-//   return Rcpp::as<double>(rtnormSEXP);
+//   return Rcpp::as<arma::vec>(rtnormSEXP);
 //
 // }
+double rtnormRcppMSM(double mean, double sd, double lower, double upper) {
+
+  //Set truncated normal function
+  // Rcpp::Environment msm("package:msm"); //this is equivalent to library(msm)
+  Rcpp::Environment msm = Rcpp::Environment::namespace_env("msm"); //This is equivalent to PACKAGE::FUNCTION()
+  Rcpp::Function rtnorm = msm["rtnorm"];
+
+  //Evaluate pmvnorm
+  SEXP rtnormSEXP;
+  rtnormSEXP = rtnorm(Rcpp::Named("n", 1),
+                      Rcpp::Named("mean", mean),
+                      Rcpp::Named("sd", sd),
+                      Rcpp::Named("lower", lower),
+                      Rcpp::Named("upper", upper));
+
+  //Convert output to double
+  return Rcpp::as<double>(rtnormSEXP);
+
+}
 
 
 

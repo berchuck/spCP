@@ -19,14 +19,9 @@ are desired from.}
 
   \describe{
 
-  \item{\code{MuTauAlpha}}{A \code{list} containing three matrices, \code{mu},
-  \code{tau} and \code{alpha}. Each matrix is dimension \code{NKeep x s}, where
-  \code{s} is the number of new time points. Each matrix contains posterior
+  \item{\code{Y}}{A \code{list} containing a matrix of predictions for each future time
+  point. Each matrix has one column for each location and contains posterior
   samples obtained by Bayesian krigging.}
-
-  \item{\code{Y}}{A \code{list} containing \code{s} posterior predictive distribution
-  matrices. Each matrix is dimension \code{NKeep x s}, where \code{s}
-  is the number of new time points. Each matrix is obtained through Bayesian krigging.}
 
   }
 }
@@ -34,9 +29,8 @@ are desired from.}
 Predicts future observations from the \code{\link{spCP}} model.
 }
 \details{
-\code{predict.spCP} uses Bayesian krigging to predict vectors at future
- time points. The function returns the krigged observed outcomes along with the
- observational level parameters (\code{mu}, \code{tau}, and \code{alpha}).
+\code{predict.spCP} uses Bayesian krigging to obtain posterior samples
+from future time points.
 }
 \author{
 Samuel I. Berchuck

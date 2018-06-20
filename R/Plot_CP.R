@@ -2,11 +2,17 @@
 #'
 #' PlotCP
 #'
-#' Plots a estimated visual field sensitivities using change point model.
+#' Plots estimated visual field sensitivities using change point model.
 #'
 #' @param object a spCP regression object.
 #'
-#' @param data a dataset containing the raw sensitivies.
+#' @param data a dataframe containing the raw sensitivies.
+#'
+#' @param location a character string indicating the column name in data of the variable of locations on the visual field.
+#'
+#' @param time a character string indicating the column name in data of the variable of visual field testing times.
+#'
+#' @param dls a character string indicating the column name in data of the variable of the raw visual field sensitivites.
 #'
 #' @param main an overall title for the plot.
 #'
@@ -50,19 +56,19 @@
 #'
 #' @param cp.ci.lty integer, specifies the type of change point confidence intervals (default = 2).
 #'
-#' @details \code{PlotVfTimeSeries} is used in the application of glaucoma progression.
-#'  In each cell is the observed DLS at each location over visits, with the red line
-#'  representing a linear regression trend.
-#'
-#' #@examples
-#' #data(VFSeries)
-#' #PlotCP(Y = VFSeries$DLS)
+#' @details \code{PlotCP} is used in the application of glaucoma progression.
+#'  The function is capable of plotting the observed DLS values across the visual field,
+#'  along with the estimated mean process (with 95 percent credible intervals) and the
+#'  estimated mean posterior change point location (with 95 percent credible intervals).
 #'
 #' @author Samuel I. Berchuck
 #'
 #' @export
 PlotCP <- function(object,
 				   data,
+				   location = "Location",
+				   time = "Time",
+				   dls = "DLS",
  				   line = TRUE,
 				   ci = TRUE,
 				   lwd = 1,
@@ -79,8 +85,8 @@ PlotCP <- function(object,
 				   cp.ci.lwd = 1,
 				   cp.ci.lty = 2,
 				   cp.ci.col = 4,
-				   main = "Estimated visual field sensitivity using \n change points",
-				   xlab = "Days from baseline visit",
+				   main = "Estimated visual field sensitivity\nusing change points",
+				   xlab = "Years from baseline visit",
 				   ylab = "Sensitivity (dB)") {
 
   ###Logical function to check for colors
@@ -94,7 +100,15 @@ PlotCP <- function(object,
   ###Check Inputs
   is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) abs(x - round(x)) < tol
   if (missing(object)) stop('"object" is missing')
+  if (!(is.spCP(object))) stop('"object" must be of class spCP')
   if (missing(data)) stop('"data" is missing')
+  if (!(is.data.frame(data))) stop('"data" must be of class data.frame')
+  if (!is.character(dls)) stop('The variable "dls" must be a character string')
+  if (!is.character(location)) stop('The variable "location" must be a character string')
+  if (!is.character(time)) stop('The variable "time" must be a character string')
+  if (!(dls %in% colnames(data))) stop('The variable name "dls" must be contained in data')
+  if (!(location %in% colnames(data))) stop('The variable name "location" must be contained in data')
+  if (!(time %in% colnames(data))) stop('The variable name "time" must be contained in data')
   if (!is.character(main)) stop('"main" must be a character string')
   if (!is.character(xlab)) stop('"xlab" must be a character string')
   if (!is.character(ylab)) stop('"ylab" must be a character string')
@@ -118,21 +132,31 @@ PlotCP <- function(object,
   ###Save original options
   pardefault <- suppressWarnings(par(no.readonly = T))
 
+  ###Set data variables
+  Location <- data[, location]
+  Time <- data[, time]
+  DLS <- data[, dls]
+
   ###Read in raw output
   beta0 <- (object$beta0)
   beta1 <- (object$beta1)
   theta <- (object$theta)
+  ScaleY <- object$datobj$ScaleY
 
   ###Number of samples
   NKeep <- dim(theta)[1]
-  Day <- unique(data$day)
+  Day <- unique(Time)
   Nu <- length(Day)
 
   ###Compute Summary Statistics
-  max.VF <- max(abs(range(data$sens_raw)))
-  max.Time <- max(abs(data$day))
+  max.VF <- max(abs(range(DLS)))
+  max.Time <- max(abs(Time))
   y_breaks <- round(seq(0, 40, by = 10))
-  x_breaks <- round(seq(0, 100*(max.Time%/%100 + as.logical(max.Time%%100)), by = 100)) #Round up to the nearest 100th
+  if (max.Time < 7) x_breaks <- round(seq(0, 1*(max.Time%/%1 + as.logical(max.Time%%1)), by = 1)) #Round up to the nearest 1th
+  if ((max.Time > 6) & (max.Time < 26)) x_breaks <- round(seq(0, 5*(max.Time%/%5 + as.logical(max.Time%%5)), by = 5)) #Round up to the nearest 5th
+  if ((max.Time > 25) & (max.Time < 71)) x_breaks <- round(seq(0, 10*(max.Time%/%10 + as.logical(max.Time%%10)), by = 10)) #Round up to the nearest 10th
+  if ((max.Time > 70) & (max.Time < 351)) x_breaks <- round(seq(0, 50*(max.Time%/%50 + as.logical(max.Time%%50)), by = 50)) #Round up to the nearest 50th
+  if (max.Time > 350) x_breaks <- round(seq(0, 100*(max.Time%/%100 + as.logical(max.Time%%100)), by = 100)) #Round up to the nearest 100th
 
   ###Create layout matrix
   layout.matrix<-matrix(c(0,0,0,1,2,3,4,0,0,
@@ -147,34 +171,33 @@ PlotCP <- function(object,
   # layout.show(pp)
 
   ###Clarify Blind Spot
-  all <- 1 : max(data$point_ID)
+  all <- 1 : max(Location)
   blind_spot <- c(26, 35)
   remaining <- all[-blind_spot]
   indeces <- c(1:25, NA, 27:34 - 1, NA, 36:54 - 2)
 
   ###Plot Time Series at Each Location
   par(mar = c(0, 0, 0, 0), oma = c(5, 10, 10, 5), mgp = c(3, 1, 0))
-  for (i in 1 : max(data$point_ID)) {
+  for (i in 1 : max(Location)) {
     if (i %in% remaining) {
       plot(-100, -100, type = "l", xaxt = "n", yaxt = "n", xlim = c(0, max.Time), ylim = c(0, 40))
-      points(data$day[data$point_ID == i], data$sens_raw[data$point_ID == i], pch = 16)
+      points(Time[Location == i], DLS[Location == i], pch = 16)
       if (line | ci) {
         Estimate <- matrix(nrow = NKeep, ncol = Nu)
         for (s in 1:NKeep) {
-          Time <- Day / 365
           CP <- theta[s, indeces[i]]
-          Estimate[s, ] <- beta0[s, indeces[i]] + beta1[s, indeces[i]] * (Time - CP) * (Time > CP)
+          Estimate[s, ] <- beta0[s, indeces[i]] + beta1[s, indeces[i]] * (Day - CP) * (Day > CP)
         }
-        if (line) lines(Day, pmax(0, apply(Estimate, 2, mean) * 10), col = col, lwd = lwd, lty = lty)
+        if (line) lines(Day, pmax(0, apply(Estimate, 2, mean)) * ScaleY, col = col, lwd = lwd, lty = lty)
         if (ci) {
-          lines(Day, pmax(0, apply(Estimate, 2, function(x) quantile(x, probs = c(0.025))) * 10), lty = ci.lty, col = ci.col, lwd = ci.lwd)
-          lines(Day, pmax(0, apply(Estimate, 2, function(x) quantile(x, probs = c(0.975))) * 10), lty = ci.lty, col = ci.col, lwd = ci.lwd)
+          lines(Day, pmax(0, apply(Estimate, 2, function(x) quantile(x, probs = c(0.025)))) * ScaleY, lty = ci.lty, col = ci.col, lwd = ci.lwd)
+          lines(Day, pmax(0, apply(Estimate, 2, function(x) quantile(x, probs = c(0.975)))) * ScaleY, lty = ci.lty, col = ci.col, lwd = ci.lwd)
         }
       }
-      if (cp.line) abline(v = mean(theta[, indeces[i]]) * 365, col = cp.col, lty = cp.lty, lwd = cp.lwd)
+      if (cp.line) abline(v = mean(theta[, indeces[i]]), col = cp.col, lty = cp.lty, lwd = cp.lwd)
       if (cp.ci) {
-      	abline(v = quantile(theta[, indeces[i]], prob = 0.025) * 365, col = cp.ci.col, lty = cp.ci.lty, lwd = cp.ci.lwd)
-		abline(v = quantile(theta[, indeces[i]], probs = 0.975) * 365, col = cp.ci.col, lty = cp.ci.lty, lwd = cp.ci.lwd)
+      	abline(v = quantile(theta[, indeces[i]], prob = 0.025), col = cp.ci.col, lty = cp.ci.lty, lwd = cp.ci.lwd)
+		abline(v = quantile(theta[, indeces[i]], probs = 0.975), col = cp.ci.col, lty = cp.ci.lty, lwd = cp.ci.lwd)
       }
     }
     if (i %in% blind_spot) plot(-100, -100, type = "n", xaxt = "n", yaxt = "n", xlim = c(0, max.Time), ylim = c(0, 40))

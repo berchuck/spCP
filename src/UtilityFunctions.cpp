@@ -13,17 +13,6 @@ arma::mat GetXTheta(arma::vec const& Theta, arma::uvec const& XThetaInd, arma::v
 
 
 
-//Function to get XTheta matrix-------------------------------------------
-// [[Rcpp::depends(RcppArmadillo)]]
-// [[Rcpp::export]]
-arma::mat GetXTheta_lmc(arma::vec const& Theta, arma::uvec const& XThetaInd, arma::vec const& TimeVec, arma::vec const& OneNu, arma::vec const& OneN, double tNu, int N, int M) {
-  arma::vec ThetaLong = arma::kron(OneNu, Theta);
-  arma::mat XTheta(N, M, arma::fill::zeros);
-  XTheta(XThetaInd) = (TimeVec - ThetaLong) % (1 * (ThetaLong <= TimeVec));
-  return XTheta;
-}
-
-
 //Function to get XTheta matrix at a particular location-------------------------------------------
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::export]]
@@ -31,18 +20,6 @@ arma::mat GetXThetaLoc(double ThetaLoc, arma::vec const& Time, arma::vec const& 
   arma::vec ThetaLong = ThetaLoc * OneNu;
   arma::mat XThetaLoc(Nu, 2, arma::fill::ones);
   XThetaLoc.col(1) = (Time - ThetaLong) % (1 * (ThetaLong <= Time));
-  return XThetaLoc;
-}
-
-
-
-//Function to get XTheta matrix at a particular location for lmc model-------------------------------------------
-// [[Rcpp::depends(RcppArmadillo)]]
-// [[Rcpp::export]]
-arma::colvec GetXThetaLoc_lmc(double ThetaLoc, arma::vec const& Time, arma::vec const& OneNu, int Nu) {
-  arma::vec ThetaLong = ThetaLoc * OneNu;
-  arma::colvec XThetaLoc(Nu);
-  XThetaLoc = (Time - ThetaLong) % (1 * (ThetaLong <= Time));
   return XThetaLoc;
 }
 
@@ -58,37 +35,6 @@ arma::vec CreatePhi(arma::vec const& Beta, arma::vec const& Lambda, arma::vec co
   arma::uvec e(1); e(0) = 4;
   PhiMatrix.rows(b) = arma::reshape(Beta, 2, M);
   PhiMatrix.rows(l) = arma::reshape(Lambda, 2, M);
-  PhiMatrix.rows(e) = arma::trans(Eta);
-  return arma::vectorise(PhiMatrix);
-}
-
-
-
-//Create phi from random effects for lmc model-------------------------------------------
-// [[Rcpp::depends(RcppArmadillo)]]
-// [[Rcpp::export]]
-arma::vec CreatePhi_lmc(arma::vec const& Beta0, arma::vec const& Beta1, arma::vec const& Lambda0, arma::vec const& Lambda1, arma::vec const& Eta, int M) {
-  arma::mat PhiMatrix(M, 5);
-  PhiMatrix.col(0) = Beta0;
-  PhiMatrix.col(1) = Beta1;
-  PhiMatrix.col(2) = Lambda0;
-  PhiMatrix.col(3) = Lambda1;
-  PhiMatrix.col(4) = Eta;
-  return arma::vectorise(PhiMatrix);
-}
-
-
-
-//Create phi from random effects-------------------------------------------
-// [[Rcpp::depends(RcppArmadillo)]]
-// [[Rcpp::export]]
-arma::vec CreatePhi_novar(arma::vec const& Beta, arma::vec const& Lambda, arma::vec const& Eta, int M) {
-  arma::mat PhiMatrix(4, M);
-  arma::uvec b(2); b(0) = 0, b(1) = 1;
-  arma::uvec l(1); l(0) = 2;
-  arma::uvec e(1); e(0) = 3;
-  PhiMatrix.rows(b) = arma::reshape(Beta, 2, M);
-  PhiMatrix.rows(l) = arma::trans(Lambda);
   PhiMatrix.rows(e) = arma::trans(Eta);
   return arma::vectorise(PhiMatrix);
 }

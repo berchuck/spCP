@@ -4,17 +4,23 @@
 \alias{PlotCP}
 \title{PlotCP}
 \usage{
-PlotCP(object, data, line = TRUE, ci = TRUE, lwd = 1, lty = 1,
-  col = 2, ci.lwd = 1, ci.lty = 2, ci.col = 2, cp.line = FALSE,
-  cp.ci = FALSE, cp.lwd = 1, cp.lty = 1, cp.col = 4, cp.ci.lwd = 1,
-  cp.ci.lty = 2, cp.ci.col = 4,
-  main = "Estimated visual field sensitivity using \\n change points",
-  xlab = "Days from baseline visit", ylab = "Sensitivity (dB)")
+PlotCP(object, data, location = "Location", time = "Time", dls = "DLS",
+  line = TRUE, ci = TRUE, lwd = 1, lty = 1, col = 2, ci.lwd = 1,
+  ci.lty = 2, ci.col = 2, cp.line = FALSE, cp.ci = FALSE, cp.lwd = 1,
+  cp.lty = 1, cp.col = 4, cp.ci.lwd = 1, cp.ci.lty = 2, cp.ci.col = 4,
+  main = "Estimated visual field sensitivity\\nusing change points",
+  xlab = "Years from baseline visit", ylab = "Sensitivity (dB)")
 }
 \arguments{
 \item{object}{a spCP regression object.}
 
-\item{data}{a dataset containing the raw sensitivies.}
+\item{data}{a dataframe containing the raw sensitivies.}
+
+\item{location}{a character string indicating the column name in data of the variable of locations on the visual field.}
+
+\item{time}{a character string indicating the column name in data of the variable of visual field testing times.}
+
+\item{dls}{a character string indicating the column name in data of the variable of the raw visual field sensitivites.}
 
 \item{line}{logical, determines if there are regression lines printed (default = TRUE).}
 
@@ -59,16 +65,13 @@ to a color or a integer (default = "blue").}
 \item{ylab}{a title for the y axis.}
 }
 \description{
-Plots a estimated visual field sensitivities using change point model.
+Plots estimated visual field sensitivities using change point model.
 }
 \details{
-\code{PlotVfTimeSeries} is used in the application of glaucoma progression.
- In each cell is the observed DLS at each location over visits, with the red line
- representing a linear regression trend.
-
-#@examples
-#data(VFSeries)
-#PlotCP(Y = VFSeries$DLS)
+\code{PlotCP} is used in the application of glaucoma progression.
+ The function is capable of plotting the observed DLS values across the visual field,
+ along with the estimated mean process (with 95 percent credible intervals) and the
+ estimated mean posterior change point location (with 95 percent credible intervals).
 }
 \author{
 Samuel I. Berchuck

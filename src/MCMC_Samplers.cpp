@@ -506,6 +506,7 @@ std::pair<para, metrobj> SampleEta(datobj DatObj, para Para, metrobj MetrObj) {
   int N = DatObj.N;
   arma::colvec Time = DatObj.Time;
   double tNu = DatObj.tNu;
+  double t1 = DatObj.t1;
 
   //Set parameter objects
   arma::colvec Phi = Para.Phi;
@@ -572,7 +573,7 @@ std::pair<para, metrobj> SampleEta(datobj DatObj, para Para, metrobj MetrObj) {
       //Sample proposal
       EtaLocProposal = arma::as_scalar(rnormRcpp(1, Eta(Loc), TuningSD));
       EtaProposal(Loc) = EtaLocProposal;
-      ThetaLocProposal = std::min(tNu, exp(EtaLocProposal));
+      ThetaLocProposal = std::max(std::min(tNu, EtaLocProposal), t1);
       XThetaLoc = GetXThetaLoc(ThetaLocProposal, Time, OneNu, Nu);
       XThetaProposal = XTheta;
       XThetaLocProposal = XThetaProposal.rows(RowIndeces);
@@ -652,9 +653,23 @@ arma::vec SampleProbit(datobj DatObj, para Para, dataug DatAug) {
   int NBelow = DatAug.NBelow;
   int NAbove = DatAug.NAbove;
 
+  //Moments
+  arma::vec Mean = Mu(WhichBelow);
+  arma::vec SD = arma::sqrt(Sigma2(WhichBelow));
+
   //Sample latent Variable from full conditional
-  YStar(WhichBelow) = rtnormRcppMSM(NBelow, Mu(WhichBelow), arma::sqrt(Sigma2(WhichBelow)), -arma::datum::inf, 0);
-  YStar(WhichAbove) = rtnormRcppMSM(NAbove, Mu(WhichAbove), arma::sqrt(Sigma2(WhichAbove)), 0, arma::datum::inf);
+  for (int i = 0; i < NBelow; i++) {
+    double Temp = rtnormRcpp(Mean(i), SD(i), true);
+    if (!arma::is_finite(Temp)) Temp = rtnormRcppMSM(Mean(i), SD(i), -100000, 0);
+    if (!arma::is_finite(Temp)) Rcpp::stop("infinte value sampled in Tobit sampling step. Most likey cause for this error is that the data being used is inappropriate (i.e., to far from zero) for a Tobit model. Consider scaling towards zero and re-running.");
+    YStar(WhichBelow(i)) = Temp;
+  }
+  for (int i = 0; i < NAbove; i++) {
+    double Temp = rtnormRcpp(Mean(i), SD(i), false);
+    if (!arma::is_finite(Temp)) Temp = rtnormRcppMSM(Mean(i), SD(i), 0, 100000);
+    if (!arma::is_finite(Temp)) Rcpp::stop("infinte value sampled in Tobit sampling step. Most likey cause for this error is that the data being used is inappropriate (i.e., to far from zero) for a Tobit model. Consider scaling towards zero and re-running.");
+    YStar(WhichAbove(i)) = Temp;
+  }
   return YStar;
 
 }
@@ -681,7 +696,12 @@ arma::vec SampleTobit(datobj DatObj, para Para, dataug DatAug) {
   arma::vec SD = arma::sqrt(Sigma2(WhichBelow));
 
   //Sample latent Variable from full conditional
-  for (int i = 0; i < NBelow; i++) YStar(WhichBelow(i)) = rtnormRcpp(Mean(i), SD(i), true);
+  for (int i = 0; i < NBelow; i++) {
+    double Temp = rtnormRcpp(Mean(i), SD(i), true);
+    if (!arma::is_finite(Temp)) Temp = rtnormRcppMSM(Mean(i), SD(i), -arma::datum::inf, 0);
+    if (!arma::is_finite(Temp)) Rcpp::stop("infinte value sampled in Tobit sampling step. Most likey cause for this error is that the data being used is inappropriate (i.e., to far from zero) for a Tobit model. Consider scaling towards zero and re-running.");
+    YStar(WhichBelow(i)) = Temp;
+  }
   return YStar;
 
 }

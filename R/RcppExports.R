@@ -25,44 +25,8 @@ GetLogLikMean <- function(DatObj_List, Para_List) {
     .Call('_spCP_GetLogLikMean', PACKAGE = 'spCP', DatObj_List, Para_List)
 }
 
-GetLogLik_lmc <- function(DatObj_List, Para_List, NKeep) {
-    .Call('_spCP_GetLogLik_lmc', PACKAGE = 'spCP', DatObj_List, Para_List, NKeep)
-}
-
-GetLogLikMean_lmc <- function(DatObj_List, Para_List) {
-    .Call('_spCP_GetLogLikMean_lmc', PACKAGE = 'spCP', DatObj_List, Para_List)
-}
-
-GetLogLik_novar <- function(DatObj_List, Para_List, NKeep) {
-    .Call('_spCP_GetLogLik_novar', PACKAGE = 'spCP', DatObj_List, Para_List, NKeep)
-}
-
-GetLogLikMean_novar <- function(DatObj_List, Para_List) {
-    .Call('_spCP_GetLogLikMean_novar', PACKAGE = 'spCP', DatObj_List, Para_List)
-}
-
 SamplePPD <- function(DatObj_List, Para_List, NKeep) {
     .Call('_spCP_SamplePPD', PACKAGE = 'spCP', DatObj_List, Para_List, NKeep)
-}
-
-SamplePPD_lmc <- function(DatObj_List, Para_List, NKeep) {
-    .Call('_spCP_SamplePPD_lmc', PACKAGE = 'spCP', DatObj_List, Para_List, NKeep)
-}
-
-SamplePPD_novar <- function(DatObj_List, Para_List, NKeep) {
-    .Call('_spCP_SamplePPD_novar', PACKAGE = 'spCP', DatObj_List, Para_List, NKeep)
-}
-
-CP_Rcpp <- function(DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_List, McmcObj_List, RawSamples, Interactive) {
-    .Call('_spCP_CP_Rcpp', PACKAGE = 'spCP', DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_List, McmcObj_List, RawSamples, Interactive)
-}
-
-spCP_lmc_Rcpp <- function(DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_List, McmcObj_List, RawSamples, Interactive) {
-    .Call('_spCP_spCP_lmc_Rcpp', PACKAGE = 'spCP', DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_List, McmcObj_List, RawSamples, Interactive)
-}
-
-spCP_novar_Rcpp <- function(DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_List, McmcObj_List, RawSamples, Interactive) {
-    .Call('_spCP_spCP_novar_Rcpp', PACKAGE = 'spCP', DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_List, McmcObj_List, RawSamples, Interactive)
 }
 
 spCP_Rcpp <- function(DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_List, McmcObj_List, RawSamples, Interactive) {
@@ -77,36 +41,16 @@ PredictFuture <- function(DatObj_List, Para_List, NKeep) {
     .Call('_spCP_PredictFuture', PACKAGE = 'spCP', DatObj_List, Para_List, NKeep)
 }
 
-PredictFuture_novar <- function(DatObj_List, Para_List, NKeep) {
-    .Call('_spCP_PredictFuture_novar', PACKAGE = 'spCP', DatObj_List, Para_List, NKeep)
-}
-
 GetXTheta <- function(Theta, XThetaInd, TimeVec, OneNu, OneN, tNu, N, M) {
     .Call('_spCP_GetXTheta', PACKAGE = 'spCP', Theta, XThetaInd, TimeVec, OneNu, OneN, tNu, N, M)
-}
-
-GetXTheta_lmc <- function(Theta, XThetaInd, TimeVec, OneNu, OneN, tNu, N, M) {
-    .Call('_spCP_GetXTheta_lmc', PACKAGE = 'spCP', Theta, XThetaInd, TimeVec, OneNu, OneN, tNu, N, M)
 }
 
 GetXThetaLoc <- function(ThetaLoc, Time, OneNu, Nu) {
     .Call('_spCP_GetXThetaLoc', PACKAGE = 'spCP', ThetaLoc, Time, OneNu, Nu)
 }
 
-GetXThetaLoc_lmc <- function(ThetaLoc, Time, OneNu, Nu) {
-    .Call('_spCP_GetXThetaLoc_lmc', PACKAGE = 'spCP', ThetaLoc, Time, OneNu, Nu)
-}
-
 CreatePhi <- function(Beta, Lambda, Eta, M) {
     .Call('_spCP_CreatePhi', PACKAGE = 'spCP', Beta, Lambda, Eta, M)
-}
-
-CreatePhi_lmc <- function(Beta0, Beta1, Lambda0, Lambda1, Eta, M) {
-    .Call('_spCP_CreatePhi_lmc', PACKAGE = 'spCP', Beta0, Beta1, Lambda0, Lambda1, Eta, M)
-}
-
-CreatePhi_novar <- function(Beta, Lambda, Eta, M) {
-    .Call('_spCP_CreatePhi_novar', PACKAGE = 'spCP', Beta, Lambda, Eta, M)
 }
 
 CholInv <- function(Cov) {

@@ -11,6 +11,7 @@ struct datobjDIAG {
   double ScaleY;
   double ScaleDM;
   double tNu;
+  double t1;
   int M;
   int Nu;
   int N;
@@ -49,26 +50,6 @@ arma::colvec TobitLogLik(datobjDIAG DatObj, paraDIAG Para, int NKeep);
 double TobitLogLikMean(datobjDIAG DatObj, paraDIAG Para);
 arma::colvec ProbitLogLik(datobjDIAG DatObj, paraDIAG Para, int NKeep);
 double ProbitLogLikMean(datobjDIAG DatObj, paraDIAG Para);
-
-//LMC DIAGNOSTIC FUNCTIONS
-arma::colvec GetLogLik_lmc(Rcpp::List DatObj_List, Rcpp::List Para_List, int NKeep);
-double GetLogLikMean_lmc(Rcpp::List DatObj_List, Rcpp::List Para_List);
-arma::colvec NormalLogLik_lmc(datobjDIAG DatObj, paraDIAG Para, int NKeep);
-double NormalLogLikMean_lmc(datobjDIAG DatObj, paraDIAG Para);
-arma::colvec TobitLogLik_lmc(datobjDIAG DatObj, paraDIAG Para, int NKeep);
-double TobitLogLikMean_lmc(datobjDIAG DatObj, paraDIAG Para);
-arma::colvec ProbitLogLik_lmc(datobjDIAG DatObj, paraDIAG Para, int NKeep);
-double ProbitLogLikMean_lmc(datobjDIAG DatObj, paraDIAG Para);
-
-//NO VARIANCE DIAGNOSTIC FUNCTIONS
-arma::colvec GetLogLik_novar(Rcpp::List DatObj_List, Rcpp::List Para_List, int NKeep);
-double GetLogLikMean_novar(Rcpp::List DatObj_List, Rcpp::List Para_List);
-arma::colvec NormalLogLik_novar(datobjDIAG DatObj, paraDIAG Para, int NKeep);
-double NormalLogLikMean_novar(datobjDIAG DatObj, paraDIAG Para);
-arma::colvec TobitLogLik_novar(datobjDIAG DatObj, paraDIAG Para, int NKeep);
-double TobitLogLikMean_novar(datobjDIAG DatObj, paraDIAG Para);
-arma::colvec ProbitLogLik_novar(datobjDIAG DatObj, paraDIAG Para, int NKeep);
-double ProbitLogLikMean_novar(datobjDIAG DatObj, paraDIAG Para);
 
 //DISTRIBUTION FUNCTIONS
 double dlnorm(double x, double mu, double sigma2);

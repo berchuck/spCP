@@ -9,6 +9,7 @@ datobj ConvertDatObj(Rcpp::List DatObj_List) {
   double ScaleY = DatObj_List["ScaleY"];
   double ScaleDM = DatObj_List["ScaleDM"];
   double tNu = DatObj_List["tNu"];
+  double t1 = DatObj_List["t1"];
   int N = DatObj_List["N"];
   int M = DatObj_List["M"];
   int Nu = DatObj_List["Nu"];
@@ -40,6 +41,7 @@ datobj ConvertDatObj(Rcpp::List DatObj_List) {
   DatObj.ScaleY = ScaleY;
   DatObj.ScaleDM = ScaleDM;
   DatObj.tNu = tNu;
+  DatObj.t1 = t1;
   DatObj.N = N;
   DatObj.M = M;
   DatObj.Nu = Nu;

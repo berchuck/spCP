@@ -1,8 +1,8 @@
 #' MCMC sampler for spatially varying change point model.
 #'
 #' \code{spCP} is a Markov chain Monte Carlo (MCMC) sampler for a spatially varying change point
-#'  model with spatially varying slopes, intercepts, and unique variances at each spatialtemporal
-#'  location. The model is implemented using the Bayesian hierarchical framework.
+#'  model with spatially varying slopes, intercepts, and unique variances at each spatial-temporal
+#'  location. The model is implemented using a Bayesian hierarchical framework.
 #'
 #' @param Y An \code{N} dimensional vector containing the observed outcome data.
 #'  Here, \code{N = M * Nu}, where \code{M} represents the number of spatial locations
@@ -102,7 +102,7 @@
 #' @details Details of the underlying statistical model proposed by proposed by
 #'  Berchuck et al. 2018. are forthcoming.
 #'
-#' @return \code{STBDwDM} returns a list containing the following objects
+#' @return \code{spCP} returns a list containing the following objects
 #'
 #'   \describe{
 #'
@@ -141,15 +141,15 @@
 #'
 #'   \item{\code{runtime}}{A \code{character} string giving the runtime of the MCMC sampler.}
 #'
-#'   \item{\code{datobj}}{A \code{list} of data objects that are used in future \code{STBDwDM} functions
+#'   \item{\code{datobj}}{A \code{list} of data objects that are used in future \code{spCP} functions
 #'   and should be ignored by the user.}
 #'
 #'   \item{\code{dataug}}{A \code{list} of data augmentation objects that are used in future
-#'   \code{STBDwDM} functions and should be ignored by the user.}
+#'   \code{spCP} functions and should be ignored by the user.}
 #'
 #'   }
 #'
-#' @author Samuel I. Berchuck
+# @author Samuel I. Berchuck
 #' @references Reference for Berchuck et al. 2018 is forthcoming.
 #' @export
 spCP <- function(Y, DM, W, Time, Starting = NULL, Hypers = NULL, Tuning = NULL, MCMC = NULL,

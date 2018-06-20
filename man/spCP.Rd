@@ -108,7 +108,7 @@ distances is often used for improved MCMC convergence. By default it is fixed at
 (default = 54).}
 }
 \value{
-\code{STBDwDM} returns a list containing the following objects
+\code{spCP} returns a list containing the following objects
 
   \describe{
 
@@ -147,36 +147,25 @@ distances is often used for improved MCMC convergence. By default it is fixed at
 
   \item{\code{runtime}}{A \code{character} string giving the runtime of the MCMC sampler.}
 
-  \item{\code{datobj}}{A \code{list} of data objects that are used in future \code{STBDwDM} functions
+  \item{\code{datobj}}{A \code{list} of data objects that are used in future \code{spCP} functions
   and should be ignored by the user.}
 
   \item{\code{dataug}}{A \code{list} of data augmentation objects that are used in future
-  \code{STBDwDM} functions and should be ignored by the user.}
+  \code{spCP} functions and should be ignored by the user.}
 
   }
 }
 \description{
 \code{spCP} is a Markov chain Monte Carlo (MCMC) sampler for a spatially varying change point
- model with spatially varying slopes, intercepts, and unique variances at each spatialtemporal
- location. The model is implemented using the Bayesian hierarchical framework.
-
-This package implements a spatiotemporal boundary detection
-with a dissimilarity metric for areal data with inference in a Bayesian setting
-using Markov chain Monte Carlo (MCMC). The response variable can be modeled as
-Gaussian (no nugget), probit or Tobit link and spatial correlation is introduced
-at each time point through a conditional autoregressive (CAR) prior. Temporal
-correlation is introduced through a hierarchical structure and can be specified as
-exponential or first-order autoregressive. Full details of the the package can be found
-in the accompanying vignette.
+ model with spatially varying slopes, intercepts, and unique variances at each spatial-temporal
+ location. The model is implemented using a Bayesian hierarchical framework.
 }
 \details{
 Details of the underlying statistical model proposed by proposed by
  Berchuck et al. 2018. are forthcoming.
 }
 \author{
-Samuel I. Berchuck
-
-Samuel I. Berchuck \email{berchuck@ad.unc.edu}
+Samuel I. Berchuck \email{sib2@duke.edu}
 }
 \references{
 Reference for Berchuck et al. 2018 is forthcoming.
