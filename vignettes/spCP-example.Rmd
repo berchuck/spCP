@@ -4,7 +4,7 @@ author: "Samuel I. Berchuck"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{womblR-example}
+  %\VignetteIndexEntry{spCP-example}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

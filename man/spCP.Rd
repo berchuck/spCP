@@ -8,8 +8,8 @@
 \usage{
 spCP(Y, DM, W, Time, Starting = NULL, Hypers = NULL, Tuning = NULL,
   MCMC = NULL, Family = "tobit", Weights = "continuous",
-  Distance = "circumference", Rho = 0.99, ScaleY = 10, ScaleDM = 100,
-  Seed = 54)
+  Distance = "circumference", Rho = 0.99, ScaleY = 10,
+  ScaleDM = 100, Seed = 54)
 }
 \arguments{
 \item{Y}{An \code{N} dimensional vector containing the observed outcome data.
@@ -164,10 +164,9 @@ distances is often used for improved MCMC convergence. By default it is fixed at
 Details of the underlying statistical model proposed by proposed by
  Berchuck et al. 2018. are forthcoming.
 }
-\author{
-Samuel I. Berchuck \email{sib2@duke.edu}
-}
 \references{
 Reference for Berchuck et al. 2018 is forthcoming.
 }
-
+\author{
+Samuel I. Berchuck \email{sib2@duke.edu}
+}

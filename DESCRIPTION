@@ -18,7 +18,7 @@ Description: Implements a spatially varying change point model with
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 5.0.1
+RoxygenNote: 6.1.0
 NeedsCompilation: yes
 Depends: R (>= 3.0.2)
 Imports: graphics, grDevices, msm (>= 1.0.0), mvtnorm (>= 1.0-0), Rcpp (>= 0.12.9), stats, utils

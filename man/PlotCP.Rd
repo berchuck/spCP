@@ -4,10 +4,11 @@
 \alias{PlotCP}
 \title{PlotCP}
 \usage{
-PlotCP(object, data, location = "Location", time = "Time", dls = "DLS",
-  line = TRUE, ci = TRUE, lwd = 1, lty = 1, col = 2, ci.lwd = 1,
-  ci.lty = 2, ci.col = 2, cp.line = FALSE, cp.ci = FALSE, cp.lwd = 1,
-  cp.lty = 1, cp.col = 4, cp.ci.lwd = 1, cp.ci.lty = 2, cp.ci.col = 4,
+PlotCP(object, data, location = "Location", time = "Time",
+  dls = "DLS", line = TRUE, ci = TRUE, lwd = 1, lty = 1,
+  col = 2, ci.lwd = 1, ci.lty = 2, ci.col = 2, cp.line = FALSE,
+  cp.ci = FALSE, cp.lwd = 1, cp.lty = 1, cp.col = 4,
+  cp.ci.lwd = 1, cp.ci.lty = 2, cp.ci.col = 4,
   main = "Estimated visual field sensitivity\\nusing change points",
   xlab = "Years from baseline visit", ylab = "Sensitivity (dB)")
 }
@@ -76,4 +77,3 @@ Plots estimated visual field sensitivities using change point model.
 \author{
 Samuel I. Berchuck
 }
-
