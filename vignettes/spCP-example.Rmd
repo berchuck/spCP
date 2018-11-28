@@ -209,7 +209,7 @@ Since none of these test statistics are terribly large in the absolute value the
 
 Once we have verified that we do not have any convergence issues, we can begin to think about analyzing the raw MCMC samples. A nice summary for `spCP` is to plot the posterior mean process at each location along with the posterior mean change point. This is possible using the `PlotCP` in the `spCP` package.
 
-```{r, echo = FALSE, fig.width = 5.2, fig.height = 5.2}
+```{r, echo = TRUE, fig.width = 5.2, fig.height = 5.2}
 VFSeries$TimeYears <- VFSeries$Time / 365
 PlotCP(reg.spCP, VFSeries, dls = "DLS", time = "TimeYears", location = "Location", cp.line = TRUE, cp.ci = TRUE)
 ```

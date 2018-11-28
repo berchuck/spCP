@@ -1,8 +1,8 @@
 Package: spCP
 Type: Package
 Title: Spatially Varying Change Points
-Version: 1.0
-Date: 2018-06-12
+Version: 1.1
+Date: 2018-11-28
 Authors@R: person("Samuel I.", "Berchuck", email = "sib2@duke.edu", role = c("aut", "cre"))
 Description: Implements a spatially varying change point model with 
     unique intercepts, slopes, variance intercepts and slopes, and 
@@ -13,8 +13,10 @@ Description: Implements a spatially varying change point model with
     are modeled jointly using a multivariate conditional 
     autoregressive (MCAR) prior. The MCAR is a unique process that
     allows for a dissimilarity metric to dictate the local spatial 
-    dependencies. Full details of the package can be found in the accompanying 
-    vignette. 
+    dependencies. Full details of the package can be found in the accompanying vignette.
+    Furthermore, the details of the package can be found in the corresponding paper on arXiv
+    by Berchuck et al (2018): "A spatially varying change points model for monitoring glaucoma 
+    progression using visual field data", <arXiv:1811.11038>.
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
