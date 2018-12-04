@@ -1,8 +1,8 @@
 Package: spCP
 Type: Package
 Title: Spatially Varying Change Points
-Version: 1.1
-Date: 2018-11-28
+Version: 1.2
+Date: 2018-12-04
 Authors@R: person("Samuel I.", "Berchuck", email = "sib2@duke.edu", role = c("aut", "cre"))
 Description: Implements a spatially varying change point model with 
     unique intercepts, slopes, variance intercepts and slopes, and 

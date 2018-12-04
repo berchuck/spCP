@@ -15,13 +15,13 @@ PlotCP(object, data, location = "Location", time = "Time",
 \arguments{
 \item{object}{a spCP regression object.}
 
-\item{data}{a dataframe containing the raw sensitivies.}
+\item{data}{a dataframe containing the raw sensitivities.}
 
 \item{location}{a character string indicating the column name in data of the variable of locations on the visual field.}
 
 \item{time}{a character string indicating the column name in data of the variable of visual field testing times.}
 
-\item{dls}{a character string indicating the column name in data of the variable of the raw visual field sensitivites.}
+\item{dls}{a character string indicating the column name in data of the variable of the raw visual field sensitivities.}
 
 \item{line}{logical, determines if there are regression lines printed (default = TRUE).}
 

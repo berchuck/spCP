@@ -3,6 +3,6 @@ Implements a spatially varying change point model with unique intercepts, slopes
 
 Finally, we present Video B.1 from the manuscript. At each location on the visual field is the posterior probability of an observed change point presented throughout follow-up and predicted one half-year into the future. By presenting the change-points in video format, the present and future pattern of progression becomes clear.
 
-![Output sample](https://github.com/berchuck/spCP/blob/master/VideoB1.gif)
+![Output sample](man/figures/VideoB1.gif)
 
 

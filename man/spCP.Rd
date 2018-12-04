@@ -23,7 +23,7 @@ for each spatial location. The order of the spatial locations must match the ord
 \code{Y}.}
 
 \item{W}{An \code{M x M} dimensional binary adjacency matrix for dictating the
-spatial neigborhood structure.}
+spatial neighborhood structure.}
 
 \item{Time}{A \code{Nu} dimensional vector containing the observed time points for each
 vector of outcomes in increasing order.}

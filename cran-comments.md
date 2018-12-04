@@ -1,5 +1,5 @@
-## Submission of version 1.1 of spCP
-* The corresponding paper to this package has been uploaded to arXiv and the link has been added to the package introduction, with the appropriate arXiv syntax.
+## Submission of version 1.2 of spCP
+* The PKG_CXXFLAGS flag in the Makevars file was removed. 
 
 ## Test environments
 * Mac: x86_64-apple-darwin13.4.0 (64-bit), R 3.3.0

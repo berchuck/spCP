@@ -33,12 +33,12 @@ spCP_Rcpp <- function(DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_
     .Call('_spCP_spCP_Rcpp', PACKAGE = 'spCP', DatObj_List, HyPara_List, MetrObj_List, Para_List, DatAug_List, McmcObj_List, RawSamples, Interactive)
 }
 
-Test <- function() {
-    invisible(.Call('_spCP_Test', PACKAGE = 'spCP'))
-}
-
 PredictFuture <- function(DatObj_List, Para_List, NKeep) {
     .Call('_spCP_PredictFuture', PACKAGE = 'spCP', DatObj_List, Para_List, NKeep)
+}
+
+Test <- function() {
+    invisible(.Call('_spCP_Test', PACKAGE = 'spCP'))
 }
 
 GetXTheta <- function(Theta, XThetaInd, TimeVec, OneNu, OneN, tNu, N, M) {

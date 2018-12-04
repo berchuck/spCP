@@ -118,15 +118,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// Test
-void Test();
-RcppExport SEXP _spCP_Test() {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Test();
-    return R_NilValue;
-END_RCPP
-}
 // PredictFuture
 arma::cube PredictFuture(Rcpp::List DatObj_List, Rcpp::List Para_List, int NKeep);
 RcppExport SEXP _spCP_PredictFuture(SEXP DatObj_ListSEXP, SEXP Para_ListSEXP, SEXP NKeepSEXP) {
@@ -138,6 +129,15 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type NKeep(NKeepSEXP);
     rcpp_result_gen = Rcpp::wrap(PredictFuture(DatObj_List, Para_List, NKeep));
     return rcpp_result_gen;
+END_RCPP
+}
+// Test
+void Test();
+RcppExport SEXP _spCP_Test() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Test();
+    return R_NilValue;
 END_RCPP
 }
 // GetXTheta
@@ -229,8 +229,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_spCP_GetLogLikMean", (DL_FUNC) &_spCP_GetLogLikMean, 2},
     {"_spCP_SamplePPD", (DL_FUNC) &_spCP_SamplePPD, 3},
     {"_spCP_spCP_Rcpp", (DL_FUNC) &_spCP_spCP_Rcpp, 8},
-    {"_spCP_Test", (DL_FUNC) &_spCP_Test, 0},
     {"_spCP_PredictFuture", (DL_FUNC) &_spCP_PredictFuture, 3},
+    {"_spCP_Test", (DL_FUNC) &_spCP_Test, 0},
     {"_spCP_GetXTheta", (DL_FUNC) &_spCP_GetXTheta, 8},
     {"_spCP_GetXThetaLoc", (DL_FUNC) &_spCP_GetXThetaLoc, 4},
     {"_spCP_CreatePhi", (DL_FUNC) &_spCP_CreatePhi, 4},

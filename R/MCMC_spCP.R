@@ -15,7 +15,7 @@
 #'  \code{Y}.
 #'
 #' @param W An \code{M x M} dimensional binary adjacency matrix for dictating the
-#'  spatial neigborhood structure.
+#'  spatial neighborhood structure.
 #'
 #' @param Time A \code{Nu} dimensional vector containing the observed time points for each
 #'  vector of outcomes in increasing order.

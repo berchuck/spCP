@@ -6,13 +6,13 @@
 #'
 #' @param object a spCP regression object.
 #'
-#' @param data a dataframe containing the raw sensitivies.
+#' @param data a dataframe containing the raw sensitivities.
 #'
 #' @param location a character string indicating the column name in data of the variable of locations on the visual field.
 #'
 #' @param time a character string indicating the column name in data of the variable of visual field testing times.
 #'
-#' @param dls a character string indicating the column name in data of the variable of the raw visual field sensitivites.
+#' @param dls a character string indicating the column name in data of the variable of the raw visual field sensitivities.
 #'
 #' @param main an overall title for the plot.
 #'
