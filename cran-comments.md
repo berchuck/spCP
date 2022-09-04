@@ -1,5 +1,5 @@
-## Submission of version 1.2 of spCP
-* The PKG_CXXFLAGS flag in the Makevars file was removed. 
+## Submission of version 1.3 of spCP
+* This is a re-submission of the spCP R package. The package has been updated based on Dirk's suggestion: RcppCore/RcppArmadillo#391.
 
 ## Test environments
 * Mac: x86_64-apple-darwin13.4.0 (64-bit), R 3.3.0

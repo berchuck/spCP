@@ -3,13 +3,25 @@
 \docType{package}
 \name{spCP}
 \alias{spCP}
-\alias{spCP-package}
 \title{MCMC sampler for spatially varying change point model.}
 \usage{
-spCP(Y, DM, W, Time, Starting = NULL, Hypers = NULL, Tuning = NULL,
-  MCMC = NULL, Family = "tobit", Weights = "continuous",
-  Distance = "circumference", Rho = 0.99, ScaleY = 10,
-  ScaleDM = 100, Seed = 54)
+spCP(
+  Y,
+  DM,
+  W,
+  Time,
+  Starting = NULL,
+  Hypers = NULL,
+  Tuning = NULL,
+  MCMC = NULL,
+  Family = "tobit",
+  Weights = "continuous",
+  Distance = "circumference",
+  Rho = 0.99,
+  ScaleY = 10,
+  ScaleDM = 100,
+  Seed = 54
+)
 }
 \arguments{
 \item{Y}{An \code{N} dimensional vector containing the observed outcome data.

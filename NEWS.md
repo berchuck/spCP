@@ -1,3 +1,7 @@
+# spCP 1.3 (2022-09-04)
+
+* Updated code based on RcppCore/RcppArmadillo#391.
+
 # spCP 1.2 (2018-12-04)
 
 * Update Makevars file.

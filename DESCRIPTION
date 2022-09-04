@@ -1,8 +1,8 @@
 Package: spCP
 Type: Package
 Title: Spatially Varying Change Points
-Version: 1.2
-Date: 2018-12-04
+Version: 1.3
+Date: 2022-09-04
 Authors@R: person("Samuel I.", "Berchuck", email = "sib2@duke.edu", role = c("aut", "cre"))
 Description: Implements a spatially varying change point model with 
     unique intercepts, slopes, variance intercepts and slopes, and 
@@ -20,7 +20,7 @@ Description: Implements a spatially varying change point model with
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.0
+RoxygenNote: 7.2.1
 NeedsCompilation: yes
 Depends: R (>= 3.0.2)
 Imports: graphics, grDevices, msm (>= 1.0.0), mvtnorm (>= 1.0-0), Rcpp (>= 0.12.9), stats, utils
